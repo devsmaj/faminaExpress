@@ -20,10 +20,10 @@ never put service-account private keys in the frontend or repository.
    with pinned browser module imports, so no frontend build step is needed.
 
 Google sign-in and SMS confirmation exchange the Firebase ID token for a signed
-Famina customer session, valid for seven days. The server always derives identity
+FA-MINNA Express customer session, valid for seven days. The server always derives identity
 from verified claims and never accepts a client-selected role. Accounts use stable
 Firebase UID identifiers. They are not automatically merged with existing demo
-email accounts. Logout clears the Famina session; the temporary Firebase session
+email accounts. Logout clears the FA-MINNA Express session; the temporary Firebase session
 is signed out after the exchange.
 
 The existing email login and other demo data paths remain. Firebase sessions use

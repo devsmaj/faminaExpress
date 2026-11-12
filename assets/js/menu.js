@@ -371,7 +371,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             itemsToRender = itemsToRender.filter(item => item.restaurantId == restaurantId);
             const restaurant = restaurants.find(r => r.id == restaurantId);
             if (restaurant) {
-                document.title = `${restaurant.name} Menu - FAMI-NA Express`;
+                document.title = `${restaurant.name} Menu - FA-MINNA Express`;
             }
         }
 

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'famina-express-v2';
+const CACHE_NAME = 'fa-minna-express-v3';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -90,7 +90,7 @@ self.addEventListener('activate', event => {
 self.addEventListener('push', event => {
   const data = event.data ? event.data.json() : {};
   const options = {
-    body: data.body || 'You have a new notification from FAMI-NA Express!',
+    body: data.body || 'You have a new notification from FA-MINNA Express!',
     icon: data.icon || '/assets/icons/icon-192x192.png',
     badge: data.badge || '/assets/icons/icon-192x192.png',
     vibrate: [200, 100, 200],
@@ -101,7 +101,7 @@ self.addEventListener('push', event => {
   };
 
   event.waitUntil(
-    self.registration.showNotification(data.title || 'FAMI-NA Express', options)
+    self.registration.showNotification(data.title || 'FA-MINNA Express', options)
   );
 });
 

@@ -56,8 +56,8 @@ router.post('/send', (req, res) => {
   const { title, body, icon, badge } = req.body;
 
   const payload = JSON.stringify({
-    title: title || 'FAMI-NA Express',
-    body: body || 'New notification from FAMI-NA Express!',
+    title: title || 'FA-MINNA Express',
+    body: body || 'New notification from FA-MINNA Express!',
     icon: icon || '/assets/icons/icon-192x192.png',
     badge: badge || '/assets/icons/icon-192x192.png'
   });

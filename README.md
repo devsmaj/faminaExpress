@@ -1,4 +1,4 @@
-# FAMI-NA Express - Food Delivery Website
+# FA-MINNA Express - Food Delivery Website
 
 A multi-page food delivery web app with a static frontend and an Express API backend.
 

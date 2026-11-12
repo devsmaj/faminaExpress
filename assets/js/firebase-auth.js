@@ -49,15 +49,15 @@ async function finish(user) {
             body: JSON.stringify({ idToken: await user.getIdToken() })
         });
         const data = await response.json();
-        if (!response.ok) throw new Error(data.message || 'Could not create your Famina session.');
+        if (!response.ok) throw new Error(data.message || 'Could not create your FA-MINNA Express session.');
         localStorage.setItem('token', data.token);
         localStorage.setItem('currentUser', JSON.stringify(data.user));
         localStorage.setItem('faminaAuthProvider', 'firebase');
         window.location.assign('profile.html');
     } catch (error) {
-        throw new Error('Could not connect to the Famina sign-in server. Please try again.');
+        throw new Error('Could not connect to the FA-MINNA Express sign-in server. Please try again.');
     } finally {
-        // Famina uses the server-issued session; leave no separate Firebase session behind.
+        // FA-MINNA Express uses the server-issued session; leave no separate Firebase session behind.
         await signOut(auth);
     }
 }

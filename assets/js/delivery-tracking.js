@@ -275,7 +275,7 @@ function callDriver() {
 function messageDriver() {
     const driverPhone = document.getElementById('driver-phone').textContent;
     if (driverPhone) {
-        const message = encodeURIComponent('Hi! I\'m tracking my FAMI-NA Express delivery. How\'s everything going?');
+        const message = encodeURIComponent('Hi! I\'m tracking my FA-MINNA Express delivery. How\'s everything going?');
         window.location.href = `sms:${driverPhone}?body=${message}`;
     }
 }
