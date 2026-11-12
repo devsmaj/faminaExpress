@@ -1,3 +1,4 @@
+const sessionSecret = require('../session-secret');
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
@@ -56,7 +57,7 @@ function verifyRestaurantOwner(req, res, next) {
     if (!token) return res.status(401).json({ message: 'No token provided' });
 
     try {
-        const decoded = jwt.verify(token, 'secretkey');
+        const decoded = jwt.verify(token, sessionSecret);
         if (decoded.role !== 'restaurant_owner') {
             return res.status(403).json({ message: 'Access denied' });
         }

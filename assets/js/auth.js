@@ -1,7 +1,7 @@
 // Auth functionality for login and registration
 (function () {
 
-const AUTH_API_BASE = 'http://localhost:3001/api';
+const AUTH_API_BASE = window.FAMINA_API_BASE || 'http://localhost:3001/api';
 
 // Handle login form submission
 document.addEventListener('DOMContentLoaded', function() {
@@ -72,6 +72,7 @@ async function handleLogin(e) {
         const data = await response.json();
 
         if (response.ok) {
+            localStorage.removeItem('faminaAuthProvider');
             localStorage.setItem('token', data.token);
             localStorage.setItem('currentUser', JSON.stringify(data.user));
 

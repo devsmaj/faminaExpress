@@ -1,4 +1,4 @@
-const CACHE_NAME = 'famína-express-v1';
+const CACHE_NAME = 'famina-express-v2';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -61,6 +61,7 @@ self.addEventListener('install', event => {
 
 // Fetch event
 self.addEventListener('fetch', event => {
+  if (event.request.method !== 'GET' || new URL(event.request.url).pathname.startsWith('/api/')) return;
   event.respondWith(
     caches.match(event.request)
       .then(response => {

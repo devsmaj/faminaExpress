@@ -151,6 +151,8 @@ function updateAuthStatus() {
 
 // Logout function
 function logout() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('faminaAuthProvider');
     localStorage.removeItem('currentUser');
     showNotification('Logged out successfully!');
     updateAuthStatus();

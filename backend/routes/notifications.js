@@ -1,3 +1,4 @@
+const sessionSecret = require('../session-secret');
 const express = require('express');
 const webpush = require('web-push');
 const router = express.Router();
@@ -29,7 +30,7 @@ router.post('/subscribe', (req, res) => {
   let userId = null;
   if (token) {
     try {
-      const decoded = jwt.verify(token, 'secretkey');
+      const decoded = jwt.verify(token, sessionSecret);
       userId = decoded.id;
     } catch (err) {
       // Continue without user association

@@ -1435,3 +1435,11 @@ body.dark-mode .notification {
     color: #e0e0e0;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
 }
+
+.social-auth { margin-top: 1.5rem; }
+.social-auth > button { margin: .4rem 0; width: 100%; }
+.social-auth form { margin-top: 1rem; }
+.social-auth [hidden] { display: none !important; }
+.social-auth #firebase-status { min-height: 1.5em; overflow-wrap: anywhere; }
+.social-auth .sms-notice { font-size: .85rem; margin-bottom: 1rem; }
+#recaptcha-container { margin-bottom: 1rem; }

@@ -517,6 +517,12 @@
             return originalFetch(input, init);
         }
 
+        // Firebase sessions must reach the real API and must never use demo data.
+        if (parsed.pathname === '/api/auth/firebase' || localStorage.getItem('faminaAuthProvider') === 'firebase') {
+            const base = window.FAMINA_API_BASE || (['localhost', '127.0.0.1'].includes(location.hostname) ? API_BASE : location.origin + '/api');
+            return originalFetch(base.replace(/\/$/, '') + parsed.pathname.slice(4) + parsed.search, init);
+        }
+
         const path = parsed.pathname.replace(/^\/api\//, '');
         const handled = await handleApi(path, method, init);
         if (handled) return handled;
