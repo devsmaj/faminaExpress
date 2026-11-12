@@ -136,8 +136,7 @@ function updateAuthStatus() {
             `;
         } else {
             authLinks.innerHTML = `
-                <a href="login.html" data-i18n="nav.login">Login</a>
-                <a href="register.html" data-i18n="nav.register">Register</a>
+                <a href="login.html" data-i18n="nav.access">Login / Sign up</a>
             `;
         }
     }

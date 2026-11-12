@@ -10,7 +10,8 @@
     "register": "Inscription",
     "logout": "Déconnexion",
     "about": "À propos",
-    "language": "Langue"
+    "language": "Langue",
+    "access": "Connexion / Inscription"
   },
   "hero": {
     "title": "Vos plats préférés, livrés chez vous",

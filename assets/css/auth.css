@@ -32,8 +32,8 @@
 .language-picker { display: flex; align-items: center; gap: 5px; }
 .header .container { gap: 12px; }
 .language-picker { position: relative; flex-shrink: 0; margin-inline-start: auto; }
-.language-toggle { display: flex; align-items: center; gap: 7px; min-height: 40px; padding: 8px 10px; border: 1px solid #deded4; border-radius: 9px; background: #fff; color: #343d31; cursor: pointer; font: inherit; font-size: .78rem; font-weight: 700; }
-.language-toggle:hover, .language-toggle[aria-expanded='true'] { border-color: #d94b23; background: #fff7f0; }
+.language-toggle { display: flex; align-items: center; gap: 7px; min-height: 40px; padding: 8px 10px; border: 0; border-radius: 0; background: transparent; color: #343d31; cursor: pointer; font: inherit; font-size: .78rem; font-weight: 700; }
+.language-toggle:hover, .language-toggle[aria-expanded='true'] { color: #d94b23; background: transparent; }
 .language-toggle:focus-visible, .language-menu button:focus-visible { outline: 3px solid #4285f4; outline-offset: 3px; }
 .language-menu { position: absolute; top: calc(100% + 10px); inset-inline-end: 0; width: 235px; padding: 10px; border-radius: 14px; background: #fff; border: 1px solid #e4e4dc; box-shadow: 0 15px 45px #0003; z-index: 1100; color: #252a22; text-align: start; }
 .language-menu[hidden] { display: none !important; }

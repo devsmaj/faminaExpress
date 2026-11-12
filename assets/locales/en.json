@@ -10,7 +10,8 @@
     "register": "Register",
     "logout": "Logout",
     "about": "About us",
-    "language": "Language"
+    "language": "Language",
+    "access": "Login / Sign up"
   },
   "hero": {
     "title": "Delicious Food Delivered Fast",
