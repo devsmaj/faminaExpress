@@ -1438,6 +1438,12 @@ body.dark-mode .notification {
 
 .social-auth { margin-top: 1.5rem; }
 .social-auth > button { margin: .4rem 0; width: 100%; }
+.social-auth > .provider-button { display: flex; align-items: center; justify-content: center; gap: .75rem; min-height: 48px; }
+.provider-button img { width: 20px; height: 20px; flex-shrink: 0; }
+.social-auth > .google-button { background: #fff; color: #1f1f1f; border: 1px solid #747775; }
+.social-auth > .google-button:hover { background: #f2f2f2; }
+.provider-button:focus-visible { outline: 3px solid #4285f4; outline-offset: 3px; }
+.provider-button:disabled { opacity: .6; cursor: wait; }
 .social-auth form { margin-top: 1rem; }
 .social-auth [hidden] { display: none !important; }
 .social-auth #firebase-status { min-height: 1.5em; overflow-wrap: anywhere; }

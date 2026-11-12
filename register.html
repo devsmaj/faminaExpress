@@ -15,32 +15,11 @@
             <div class="container">
                 <h2>Create Account</h2>
 
-                <!-- Customer Registration Form -->
-                <form id="customer-register-form" class="form active-form">
-                    <div class="form-group">
-                        <label for="customer-name">Full Name</label>
-                        <input type="text" id="customer-name" name="name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="customer-email">Email</label>
-                        <input type="email" id="customer-email" name="email" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="customer-password">Password</label>
-                        <input type="password" id="customer-password" name="password" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="customer-confirm-password">Confirm Password</label>
-                        <input type="password" id="customer-confirm-password" name="confirm-password" required>
-                    </div>
-                    <button type="submit" class="submit-btn">Create Customer Account</button>
-                </form>
 
-
-                <section id="firebase-auth" class="social-auth" aria-label="Other sign-in methods">
-                    <p>Or continue with</p>
-                    <button type="button" id="google-continue" class="submit-btn">Continue with Google</button>
-                    <button type="button" id="phone-continue" class="submit-btn">Continue with phone number</button>
+                <section id="firebase-auth" class="social-auth" aria-label="Sign in with Google or phone">
+                    <p>Use Google or your phone number to continue securely.</p>
+                    <button type="button" id="google-continue" class="submit-btn provider-button google-button"><img src="assets/icons/google.svg" alt="" aria-hidden="true">Continue with Google</button>
+                    <button type="button" id="phone-continue" class="submit-btn provider-button"><img src="assets/icons/phone.svg" alt="" aria-hidden="true">Continue with phone number</button>
                     <p id="firebase-status" role="status" aria-live="polite"></p>
                     <form id="phone-form" hidden>
                         <div class="form-group">
@@ -73,7 +52,6 @@
     <script src="assets/js/frontend-api.js"></script>
     <script src="assets/js/utils.js"></script>
     <script src="assets/js/main.js"></script>
-    <script src="assets/js/auth.js"></script>
 </body>
 </html>
 
