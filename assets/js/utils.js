@@ -11,6 +11,7 @@ function loadComponent(elementId, componentPath) {
         .then(response => response.text())
         .then(data => {
             document.getElementById(elementId).innerHTML = data;
+            document.dispatchEvent(new CustomEvent('componentloaded'));
         })
         .catch(error => console.error('Error loading component:', error));
 }

@@ -1,0 +1,153 @@
+{
+  "nav": {
+    "home": "Accueil",
+    "menu": "Menu",
+    "restaurants": "Restaurants",
+    "cart": "Panier",
+    "orders": "Commandes",
+    "profile": "Profil",
+    "login": "Connexion",
+    "register": "Inscription",
+    "logout": "Déconnexion",
+    "about": "À propos",
+    "language": "Langue"
+  },
+  "hero": {
+    "title": "Vos plats préférés, livrés chez vous",
+    "subtitle": "Commandez auprès de vos restaurants préférés et faites-vous livrer à domicile.",
+    "cta": "Commander"
+  },
+  "categories": {
+    "title": "Découvrez nos catégories",
+    "pizza": "Pizza",
+    "burger": "Burger",
+    "pasta": "Pâtes",
+    "salad": "Salades",
+    "dessert": "Desserts",
+    "beverage": "Boissons"
+  },
+  "restaurants": {
+    "title": "Restaurants à découvrir",
+    "rating": "Note",
+    "delivery_time": "Délai de livraison",
+    "view_menu": "Voir le menu"
+  },
+  "features": {
+    "fast_delivery": "Livraison rapide",
+    "fast_delivery_desc": "Vos plats livrés en moins de 30 minutes",
+    "quality_food": "Des plats de qualité",
+    "quality_food_desc": "Des ingrédients frais et des restaurants de confiance",
+    "easy_ordering": "Commande facile",
+    "easy_ordering_desc": "Commandez en toute simplicité"
+  },
+  "footer": {
+    "about": "À propos",
+    "contact": "Nous contacter",
+    "privacy": "Confidentialité",
+    "terms": "Conditions d’utilisation",
+    "follow_us": "Suivez-nous",
+    "newsletter": "Abonnez-vous à notre newsletter",
+    "newsletter_placeholder": "Votre adresse e-mail",
+    "subscribe": "S’abonner",
+    "tagline": "De bons plats, livrés directement chez vous.",
+    "quick_links": "Liens utiles",
+    "support": "Assistance",
+    "newsletter_title": "Newsletter",
+    "newsletter_description": "Recevez les nouveautés et les offres de nos restaurants.",
+    "faq": "Questions fréquentes",
+    "copyright": "© 2026 FA-MINNA Express. Tous droits réservés."
+  },
+  "auth": {
+    "login_title": "Heureux de vous retrouver",
+    "register_title": "Créer un compte",
+    "email": "E-mail",
+    "password": "Mot de passe",
+    "confirm_password": "Confirmer le mot de passe",
+    "name": "Nom complet",
+    "login": "Se connecter",
+    "register": "S’inscrire",
+    "no_account": "Pas encore de compte ?",
+    "have_account": "Vous avez déjà un compte ?",
+    "login_here": "Se connecter",
+    "register_here": "Créer un compte",
+    "subtitle": "Votre prochain moment gourmand commence ici.",
+    "google": "Continuer avec Google",
+    "phone": "Continuer avec un numéro de téléphone",
+    "phone_label": "Numéro de téléphone avec indicatif pays",
+    "sms_notice": "En continuant, vous acceptez de recevoir un SMS de vérification. Des frais de messagerie peuvent s’appliquer. Google utilise votre numéro pour prévenir les abus.",
+    "send_code": "Recevoir le code",
+    "code_label": "Code de vérification SMS",
+    "verify": "Vérifier et continuer",
+    "resend": "Renvoyer le code",
+    "eyebrow": "Le goût des bons moments",
+    "scene_title": "De bons plats.\nDe beaux moments.",
+    "scene_body": "Vos saveurs préférées, tout près de vous. Rejoignez FA-MINNA Express et trouvez votre prochain repas.",
+    "trust": "Un accès simple et sécurisé avec Google ou votre téléphone.",
+    "pause": "Mettre la vidéo en pause",
+    "play": "Lire la vidéo",
+    "errors": {
+      "cancelled": "Connexion Google annulée. Veuillez réessayer.",
+      "popup": "Autorisez les fenêtres pop-up pour ce site, puis réessayez.",
+      "domain": "La connexion n’est pas encore disponible sur ce domaine.",
+      "disabled": "Ce mode de connexion est temporairement indisponible.",
+      "phone": "Saisissez un numéro valide avec l’indicatif pays, par exemple +23566123456.",
+      "code": "Code SMS incorrect. Veuillez réessayer.",
+      "expired": "Ce code a expiré. Demandez un nouveau code.",
+      "attempts": "Trop de tentatives. Patientez avant de réessayer.",
+      "quota": "Les SMS sont temporairement indisponibles. Essayez Google.",
+      "network": "Vérifiez votre connexion Internet et réessayez.",
+      "server": "Impossible de joindre le serveur de connexion. Veuillez réessayer.",
+      "wait": "Patientez 60 secondes avant de demander un nouveau code.",
+      "first": "Demandez d’abord un code SMS.",
+      "sent": "Code envoyé. Saisissez les six chiffres ci-dessous.",
+      "failed": "Échec de la connexion. Veuillez réessayer."
+    }
+  },
+  "cart": {
+    "title": "Votre panier",
+    "empty": "Votre panier est vide",
+    "add_items": "Ajoutez de bons plats pour commencer",
+    "item": "Article",
+    "quantity": "Qté",
+    "price": "Prix",
+    "total": "Total",
+    "checkout": "Passer la commande",
+    "continue_shopping": "Continuer mes achats"
+  },
+  "checkout": {
+    "title": "Validation de la commande",
+    "delivery_address": "Adresse de livraison",
+    "payment_method": "Mode de paiement",
+    "order_summary": "Récapitulatif",
+    "place_order": "Confirmer la commande",
+    "back_to_cart": "Retour au panier"
+  },
+  "orders": {
+    "title": "Vos commandes",
+    "order_number": "Commande n°",
+    "date": "Date",
+    "status": "Statut",
+    "total": "Total",
+    "view_details": "Voir les détails",
+    "reorder": "Commander à nouveau",
+    "track_delivery": "Suivre la livraison"
+  },
+  "menu": {
+    "title": "Menu",
+    "add_to_cart": "Ajouter au panier",
+    "view_restaurant": "Voir le restaurant"
+  },
+  "common": {
+    "loading": "Chargement…",
+    "error": "Une erreur est survenue",
+    "success": "Opération réussie",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "view": "Voir",
+    "close": "Fermer",
+    "search": "Rechercher",
+    "filter": "Filtrer"
+  }
+}

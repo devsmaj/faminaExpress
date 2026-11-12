@@ -6,6 +6,7 @@
     <title>Restaurant Dashboard - FA-MINNA Express</title>
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="assets/css/responsive.css">
+    <link rel="stylesheet" href="assets/css/auth.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
@@ -17,8 +18,8 @@
                 <div class="dashboard-header">
                     <h1>Restaurant Dashboard</h1>
                     <div class="restaurant-info">
-                        <h2 id="restaurant-name">Loading...</h2>
-                        <p id="restaurant-cuisine">Loading...</p>
+                        <h2 id="restaurant-name" data-i18n="common.loading">Loading...</h2>
+                        <p id="restaurant-cuisine" data-i18n="common.loading">Loading...</p>
                     </div>
                 </div>
 
@@ -58,7 +59,7 @@
                 <div class="dashboard-tabs">
                     <button class="tab-btn active" data-tab="overview">Overview</button>
                     <button class="tab-btn" data-tab="menu">Menu Management</button>
-                    <button class="tab-btn" data-tab="orders">Orders</button>
+                    <button class="tab-btn" data-tab="orders" data-i18n="nav.orders">Orders</button>
                     <button class="tab-btn" data-tab="analytics">Analytics</button>
                     <button class="tab-btn" data-tab="settings">Settings</button>
                 </div>
@@ -190,12 +191,12 @@
                     <label for="item-category">Category</label>
                     <select id="item-category" required>
                         <option value="">Select Category</option>
-                        <option value="Pizza">Pizza</option>
-                        <option value="Burger">Burger</option>
-                        <option value="Pasta">Pasta</option>
-                        <option value="Salad">Salad</option>
-                        <option value="Dessert">Dessert</option>
-                        <option value="Beverage">Beverage</option>
+                        <option value="Pizza" data-i18n="categories.pizza">Pizza</option>
+                        <option value="Burger" data-i18n="categories.burger">Burger</option>
+                        <option value="Pasta" data-i18n="categories.pasta">Pasta</option>
+                        <option value="Salad" data-i18n="categories.salad">Salad</option>
+                        <option value="Dessert" data-i18n="categories.dessert">Dessert</option>
+                        <option value="Beverage" data-i18n="categories.beverage">Beverage</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -211,7 +212,7 @@
                     <input type="url" id="item-image" placeholder="https://...">
                 </div>
                 <div class="form-actions">
-                    <button type="button" class="btn-secondary" id="cancel-btn">Cancel</button>
+                    <button type="button" class="btn-secondary" id="cancel-btn" data-i18n="common.cancel">Cancel</button>
                     <button type="submit" class="btn">Save Item</button>
                 </div>
             </form>

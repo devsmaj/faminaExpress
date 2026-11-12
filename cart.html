@@ -6,6 +6,7 @@
     <title>Cart - FA-MINNA Express</title>
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="assets/css/responsive.css">
+    <link rel="stylesheet" href="assets/css/auth.css">
 </head>
 <body>
     <div id="header"></div>
@@ -13,14 +14,14 @@
     <main>
         <section class="cart-section">
             <div class="container">
-                <h2>Your Cart</h2>
+                <h2 data-i18n="cart.title">Your Cart</h2>
                 <div id="cart-items" class="cart-items">
                     <!-- Cart items will be populated by JavaScript -->
                 </div>
                 <div id="cart-total" class="cart-total">
                     <!-- Total will be calculated by JavaScript -->
                 </div>
-                <a href="checkout.html" class="checkout-btn">Proceed to Checkout</a>
+                <a href="checkout.html" class="checkout-btn" data-i18n="cart.checkout">Proceed to Checkout</a>
             </div>
         </section>
     </main>

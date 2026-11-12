@@ -138,15 +138,16 @@ function updateAuthStatus() {
     if (authLinks) {
         if (user) {
             authLinks.innerHTML = `
-                <a href="#" onclick="logout()">Logout</a>
+                <a href="#" onclick="logout()" data-i18n="nav.logout">Logout</a>
             `;
         } else {
             authLinks.innerHTML = `
-                <a href="login.html">Login</a>
-                <a href="register.html">Register</a>
+                <a href="login.html" data-i18n="nav.login">Login</a>
+                <a href="register.html" data-i18n="nav.register">Register</a>
             `;
         }
     }
+    if (window.i18n) window.i18n.updatePageTranslations();
 }
 
 // Logout function
@@ -166,6 +167,7 @@ if (typeof loadComponent === 'undefined') {
             .then(response => response.text())
             .then(data => {
                 document.getElementById(elementId).innerHTML = data;
+                document.dispatchEvent(new CustomEvent('componentloaded'));
             })
             .catch(error => console.error('Error loading component:', error));
     }
@@ -220,7 +222,7 @@ if (typeof showNotification === 'undefined') {
 // Register service worker for push notifications
 async function registerServiceWorker() {
     try {
-        const registration = await navigator.serviceWorker.register('/sw.js');
+        const registration = await navigator.serviceWorker.register('sw.js');
         console.log('Service Worker registered successfully:', registration);
         return registration;
     } catch (error) {

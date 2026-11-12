@@ -8,11 +8,13 @@
     "profile": "Profile",
     "login": "Login",
     "register": "Register",
-    "logout": "Logout"
+    "logout": "Logout",
+    "about": "About us",
+    "language": "Language"
   },
   "hero": {
     "title": "Delicious Food Delivered Fast",
-    "subtitle": "Order from your favorite restaurants and get it delivered to your doorstep",
+    "subtitle": "Order from your favorite restaurants and get it delivered to your doorstep in minutes.",
     "cta": "Order Now"
   },
   "categories": {
@@ -25,7 +27,7 @@
     "beverage": "Beverage"
   },
   "restaurants": {
-    "title": "Popular Restaurants",
+    "title": "Featured restaurants",
     "rating": "Rating",
     "delivery_time": "Delivery Time",
     "view_menu": "View Menu"
@@ -46,7 +48,14 @@
     "follow_us": "Follow Us",
     "newsletter": "Subscribe to our newsletter",
     "newsletter_placeholder": "Enter your email",
-    "subscribe": "Subscribe"
+    "subscribe": "Subscribe",
+    "tagline": "Delivering delicious food right to your doorstep.",
+    "quick_links": "Quick links",
+    "support": "Support",
+    "newsletter_title": "Newsletter",
+    "newsletter_description": "Get updates on new restaurants and offers.",
+    "faq": "FAQ",
+    "copyright": "© 2026 FA-MINNA Express. All rights reserved."
   },
   "auth": {
     "login_title": "Welcome Back",
@@ -60,7 +69,39 @@
     "no_account": "Don't have an account?",
     "have_account": "Already have an account?",
     "login_here": "Login here",
-    "register_here": "Register here"
+    "register_here": "Register here",
+    "subtitle": "Your next delicious moment starts here.",
+    "google": "Continue with Google",
+    "phone": "Continue with phone number",
+    "phone_label": "Phone number with country code",
+    "sms_notice": "By continuing, you agree to receive a verification SMS. Standard message rates may apply. Google processes your number to prevent abuse.",
+    "send_code": "Send verification code",
+    "code_label": "SMS verification code",
+    "verify": "Verify and continue",
+    "resend": "Resend code",
+    "eyebrow": "A taste of something wonderful",
+    "scene_title": "Good food.\nGreat moments.",
+    "scene_body": "Your favourite flavours, a little closer. Join FA-MINNA Express and find your next delicious meal.",
+    "trust": "A simple, secure start with Google or your phone.",
+    "pause": "Pause background video",
+    "play": "Play background video",
+    "errors": {
+      "cancelled": "Google sign-in was cancelled. Please try again.",
+      "popup": "Allow popups for this website, then try again.",
+      "domain": "Sign-in is not available on this website domain yet.",
+      "disabled": "This sign-in method is temporarily unavailable.",
+      "phone": "Enter a valid phone number including the country code, for example +23566123456.",
+      "code": "The SMS code is incorrect. Please try again.",
+      "expired": "This SMS code has expired. Request a new code.",
+      "attempts": "Too many attempts. Please wait before trying again.",
+      "quota": "SMS is temporarily unavailable. Please try Google.",
+      "network": "Check your internet connection and try again.",
+      "server": "Could not connect to the sign-in server. Please try again.",
+      "wait": "Please wait 60 seconds before requesting another code.",
+      "first": "Request an SMS code first.",
+      "sent": "SMS code sent. Enter the six-digit code below.",
+      "failed": "Sign-in failed. Please try again."
+    }
   },
   "cart": {
     "title": "Your Cart",

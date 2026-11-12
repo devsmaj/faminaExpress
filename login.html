@@ -6,45 +6,61 @@
     <title>Login - FA-MINNA Express</title>
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="assets/css/responsive.css">
+    <link rel="stylesheet" href="assets/css/auth.css">
 </head>
-<body>
+<body class="auth-page" data-auth-page="login">
     <div id="header"></div>
 
-    <main>
-        <section class="form-section">
+    <main class="auth-scene">
+        <video class="auth-video" data-src="assets/videos/chef-dough.mp4" poster="assets/videos/chef-dough-poster.jpg" muted loop playsinline preload="none" aria-hidden="true" tabindex="-1"></video>
+        <div class="auth-shade" aria-hidden="true"></div>
+        <div class="auth-layout">
+            <div class="auth-story">
+                <p class="auth-eyebrow" data-i18n="auth.eyebrow">A taste of something wonderful</p>
+                <h1 data-i18n="auth.scene_title">Good food. Great moments.</h1>
+                <p data-i18n="auth.scene_body">Your favourite flavours, a little closer. Join FA-MINNA Express and find your next delicious meal.</p>
+            </div>
+        <section class="form-section auth-card">
             <div class="container">
-                <h2 class="smaj">Login to Your Account</h2>
+                <h2 class="smaj" data-i18n="auth.login_title">Login to Your Account</h2>
 
                 <section id="firebase-auth" class="social-auth" aria-label="Sign in with Google or phone">
-                    <p>Use Google or your phone number to continue securely.</p>
-                    <button type="button" id="google-continue" class="submit-btn provider-button google-button"><img src="assets/icons/google.svg" alt="" aria-hidden="true">Continue with Google</button>
-                    <button type="button" id="phone-continue" class="submit-btn provider-button"><img src="assets/icons/phone.svg" alt="" aria-hidden="true">Continue with phone number</button>
+                    <p class="auth-intro" data-i18n="auth.subtitle">Your next delicious moment starts here.</p>
+                    <button type="button" id="google-continue" class="submit-btn provider-button google-button"><img src="assets/icons/google.svg" alt="" aria-hidden="true"><span data-i18n="auth.google">Continue with Google</span></button>
+                    <button type="button" id="phone-continue" class="submit-btn provider-button"><img src="assets/icons/phone.svg" alt="" aria-hidden="true"><span data-i18n="auth.phone">Continue with phone number</span></button>
                     <p id="firebase-status" role="status" aria-live="polite"></p>
                     <form id="phone-form" hidden>
                         <div class="form-group">
-                            <label for="auth-phone">Phone number with country code</label>
-                            <input id="auth-phone" type="tel" autocomplete="tel" placeholder="+971501234567" required>
+                            <label for="auth-phone" data-i18n="auth.phone_label">Phone number with country code</label>
+                            <input id="auth-phone" type="tel" autocomplete="tel" placeholder="+23566123456" dir="ltr" required>
                         </div>
-                        <p class="sms-notice">By continuing, you agree to receive a verification SMS. Standard message rates may apply. Google processes your number to prevent abuse.</p>
+                        <p class="sms-notice" data-i18n="auth.sms_notice">By continuing, you agree to receive a verification SMS. Standard message rates may apply. Google processes your number to prevent abuse.</p>
                         <div id="recaptcha-container"></div>
-                        <button type="submit" class="submit-btn">Send verification code</button>
+                        <button type="submit" class="submit-btn" data-i18n="auth.send_code">Send verification code</button>
                     </form>
                     <form id="phone-code-form" hidden>
                         <div class="form-group">
-                            <label for="auth-code">SMS verification code</label>
+                            <label for="auth-code" data-i18n="auth.code_label">SMS verification code</label>
                             <input id="auth-code" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" required>
                         </div>
-                        <button type="submit" class="submit-btn">Verify and continue</button>
-                        <button type="button" id="resend-code">Resend code</button>
+                        <button type="submit" class="submit-btn" data-i18n="auth.verify">Verify and continue</button>
+                        <button type="button" id="resend-code" data-i18n="auth.resend">Resend code</button>
                     </form>
                 </section>
-                <p class="mt-2">Don't have an account? <a href="register.html">Register here</a></p>
+                <p class="auth-trust"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m12 3 8 4v5c0 5-8 9-8 9s-8-4-8-9V7z"/><path d="m8 12 3 3 5-6"/></svg><span data-i18n="auth.trust">A simple, secure start with Google or your phone.</span></p>
+                <p class="auth-switch"><span data-i18n="auth.no_account">Don't have an account?</span> <a href="register.html" data-i18n="auth.register_here">Register here</a></p>
             </div>
         </section>
+        </div>
+        <button type="button" class="video-toggle" id="video-toggle" aria-pressed="false">
+            <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"></svg>
+            <span data-i18n="auth.pause">Pause background video</span>
+        </button>
     </main>
 
     <div id="footer"></div>
 
+    <script src="assets/js/auth-scene.js" defer></script>
     <script src="assets/js/config.js"></script>
     <script type="module" src="assets/js/firebase-auth.js"></script>
     <script src="assets/js/data.js"></script>

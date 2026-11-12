@@ -12,29 +12,33 @@ let confirmation;
 let resendAt = 0;
 let busy = false;
 
-function message(error) {
-    const messages = {
-        'auth/popup-closed-by-user': 'Google sign-in was cancelled. Please try again.',
-        'auth/popup-blocked': 'Allow popups for this website, then try again.',
-        'auth/unauthorized-domain': 'This website domain must be authorized in Firebase Authentication settings.',
-        'auth/operation-not-allowed': 'This sign-in method must be enabled in Firebase Authentication.',
-        'auth/invalid-phone-number': 'Enter a valid phone number including the country code.',
-        'auth/invalid-verification-code': 'The SMS code is incorrect. Please try again.',
-        'auth/code-expired': 'This SMS code has expired. Request a new code.',
-        'auth/too-many-requests': 'Too many attempts. Please wait before trying again.',
-        'auth/quota-exceeded': 'SMS is temporarily unavailable. Please try Google or email.',
-        'auth/network-request-failed': 'Check your internet connection and try again.'
-    };
-    return messages[error.code] || error.message || 'Sign-in failed. Please try again.';
+function authError(key) { const error = new Error(key); error.authKey = key; return error; }
+function showStatus(key) {
+    status.dataset.i18n = 'auth.errors.' + key;
+    status.textContent = window.i18n ? window.i18n.t(status.dataset.i18n, 'Please try again.') : 'Please try again.';
 }
+function errorKey(error) {
+    const keys = {
+        'auth/popup-closed-by-user': 'cancelled', 'auth/popup-blocked': 'popup',
+        'auth/unauthorized-domain': 'domain', 'auth/operation-not-allowed': 'disabled',
+        'auth/invalid-phone-number': 'phone', 'auth/invalid-verification-code': 'code',
+        'auth/code-expired': 'expired', 'auth/too-many-requests': 'attempts',
+        'auth/quota-exceeded': 'quota', 'auth/network-request-failed': 'network'
+    };
+    return error.authKey || keys[error.code] || 'failed';
+}
+function setAuthLanguage() { auth.languageCode = (window.i18n?.getCurrentLanguage() || 'fr-TD').split('-')[0]; }
+setAuthLanguage();
+document.addEventListener('languagechange', setAuthLanguage);
 
 async function run(action) {
     if (busy) return;
     busy = true;
+    delete status.dataset.i18n;
     status.textContent = '';
     panel.querySelectorAll('button').forEach(button => button.disabled = true);
     try { await action(); }
-    catch (error) { status.textContent = message(error); }
+    catch (error) { showStatus(errorKey(error)); }
     finally {
         busy = false;
         panel.querySelectorAll('button').forEach(button => button.disabled = false);
@@ -55,7 +59,7 @@ async function finish(user) {
         localStorage.setItem('faminaAuthProvider', 'firebase');
         window.location.assign('profile.html');
     } catch (error) {
-        throw new Error('Could not connect to the FA-MINNA Express sign-in server. Please try again.');
+        throw authError('server');
     } finally {
         // FA-MINNA Express uses the server-issued session; leave no separate Firebase session behind.
         await signOut(auth);
@@ -71,15 +75,15 @@ document.getElementById('phone-continue').addEventListener('click', () => {
 });
 
 async function sendCode() {
-    if (Date.now() < resendAt) throw new Error('Please wait 60 seconds before requesting another code.');
+    if (Date.now() < resendAt) throw authError('wait');
     const phone = document.getElementById('auth-phone').value.trim().replace(/[\s()-]/g, '');
-    if (!/^\+[1-9]\d{7,14}$/.test(phone)) throw new Error('Include your country code, for example +971501234567.');
+    if (!/^\+[1-9]\d{7,14}$/.test(phone)) throw authError('phone');
     try {
         if (!verifier) verifier = new RecaptchaVerifier(auth, 'recaptcha-container', { size: 'normal' });
         confirmation = await signInWithPhoneNumber(auth, phone, verifier);
         resendAt = Date.now() + 60000;
         codeForm.hidden = false;
-        status.textContent = 'SMS code sent. Enter the six-digit code below.';
+        showStatus('sent');
         document.getElementById('auth-code').focus();
     } finally {
         if (verifier) { verifier.clear(); verifier = null; }
@@ -94,7 +98,7 @@ document.getElementById('auth-phone').addEventListener('input', () => {
 codeForm.addEventListener('submit', event => {
     event.preventDefault();
     run(async () => {
-        if (!confirmation) throw new Error('Request an SMS code first.');
+        if (!confirmation) throw authError('first');
         await finish((await confirmation.confirm(document.getElementById('auth-code').value.trim())).user);
     });
 });

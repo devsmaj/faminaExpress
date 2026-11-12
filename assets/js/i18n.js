@@ -1,120 +1,63 @@
-// Internationalization (i18n) utility for multi-language support
-
 class I18n {
     constructor() {
-        this.currentLanguage = localStorage.getItem('language') || 'en';
+        const saved = localStorage.getItem('language');
+        this.currentLanguage = ['en', 'fr-TD', 'ar-TD'].includes(saved) ? saved : 'fr-TD';
         this.translations = {};
         this.observers = [];
+        this.requestId = 0;
     }
-
-    // Load language file
     async loadLanguage(lang) {
+        if (!['en', 'fr-TD', 'ar-TD'].includes(lang)) return false;
+        const requestId = ++this.requestId;
         try {
             const response = await fetch(`assets/locales/${lang}.json`);
-            if (!response.ok) {
-                throw new Error(`Language file not found: ${lang}`);
-            }
-            this.translations = await response.json();
+            if (!response.ok) throw new Error('Language unavailable');
+            const data = await response.json();
+            if (requestId !== this.requestId) return false;
+            this.translations = data;
             this.currentLanguage = lang;
             localStorage.setItem('language', lang);
-            this.notifyObservers();
+            document.documentElement.lang = lang;
+            document.documentElement.dir = lang === 'ar-TD' ? 'rtl' : 'ltr';
+            this.updatePageTranslations();
+            this.observers.forEach(callback => callback(lang));
+            document.dispatchEvent(new CustomEvent('languagechange', { detail: lang }));
             return true;
-        } catch (error) {
-            console.error('Error loading language:', error);
-            return false;
-        }
+        } catch (error) { console.error('Could not load language:', error); return false; }
     }
-
-    // Get translation by key path (e.g., 'nav.home', 'hero.title')
     t(key, fallback = '') {
-        const keys = key.split('.');
-        let value = this.translations;
-
-        for (const k of keys) {
-            value = value && value[k];
-        }
-
-        return value || fallback || key;
+        const value = key.split('.').reduce((value, part) => value?.[part], this.translations);
+        return typeof value === 'string' ? value : fallback || key;
     }
-
-    // Get current language
-    getCurrentLanguage() {
-        return this.currentLanguage;
-    }
-
-    // Set language
-    async setLanguage(lang) {
-        if (lang !== this.currentLanguage) {
-            const success = await this.loadLanguage(lang);
-            if (success) {
-                this.updatePageTranslations();
-            }
-            return success;
-        }
-        return true;
-    }
-
-    // Update all translatable elements on the page
+    getCurrentLanguage() { return this.currentLanguage; }
+    async setLanguage(lang) { return this.loadLanguage(lang); }
     updatePageTranslations() {
-        // Update elements with data-i18n attribute
-        const elements = document.querySelectorAll('[data-i18n]');
-        elements.forEach(element => {
-            const key = element.getAttribute('data-i18n');
-            const translation = this.t(key);
-
-            if (element.tagName === 'INPUT' && element.hasAttribute('placeholder')) {
-                element.placeholder = translation;
-            } else {
-                element.textContent = translation;
-            }
+        document.querySelectorAll('[data-i18n]').forEach(element => {
+            const translation = this.t(element.getAttribute('data-i18n'), element.textContent);
+            if (element.tagName === 'INPUT' && element.hasAttribute('placeholder')) element.placeholder = translation;
+            else if (element.textContent !== translation) element.textContent = translation;
         });
-
-        // Update elements with data-i18n-title attribute
-        const titleElements = document.querySelectorAll('[data-i18n-title]');
-        titleElements.forEach(element => {
-            const key = element.getAttribute('data-i18n-title');
-            element.title = this.t(key);
-        });
-
-        // Update elements with data-i18n-value attribute
-        const valueElements = document.querySelectorAll('[data-i18n-value]');
-        valueElements.forEach(element => {
-            const key = element.getAttribute('data-i18n-value');
-            element.value = this.t(key);
-        });
+        for (const attribute of ['title', 'value', 'aria-label']) {
+            document.querySelectorAll(`[data-i18n-${attribute}]`).forEach(element => {
+                element.setAttribute(attribute, this.t(element.getAttribute(`data-i18n-${attribute}`)));
+            });
+        }
+        document.querySelectorAll('[data-language-select]').forEach(select => select.value = this.currentLanguage);
+        const titleKey = document.body.dataset.authPage;
+        if (titleKey) document.title = `${this.t(`auth.${titleKey}_title`)} - FA-MINNA Express`;
     }
-
-    // Initialize i18n on page load
-    async init() {
-        await this.loadLanguage(this.currentLanguage);
-        this.updatePageTranslations();
-    }
-
-    // Subscribe to language changes
-    subscribe(callback) {
-        this.observers.push(callback);
-    }
-
-    // Unsubscribe from language changes
-    unsubscribe(callback) {
-        this.observers = this.observers.filter(obs => obs !== callback);
-    }
-
-    // Notify observers of language change
-    notifyObservers() {
-        this.observers.forEach(callback => callback(this.currentLanguage));
-    }
+    async init() { if (!await this.loadLanguage(this.currentLanguage)) await this.loadLanguage('en'); }
+    subscribe(callback) { this.observers.push(callback); }
+    unsubscribe(callback) { this.observers = this.observers.filter(observer => observer !== callback); }
 }
-
-// Create global i18n instance
 const i18n = new I18n();
-
-// Initialize on DOM ready
-document.addEventListener('DOMContentLoaded', () => {
-    i18n.init();
+window.i18n = i18n;
+document.addEventListener('change', async event => {
+    if (!event.target.matches('[data-language-select]')) return;
+    if (!await i18n.setLanguage(event.target.value)) event.target.value = i18n.getCurrentLanguage();
 });
-
-// Export for use in other modules
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = I18n;
-}
+document.addEventListener('componentloaded', () => i18n.updatePageTranslations());
+// main.js injects this script after DOMContentLoaded, so initialize immediately then.
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => i18n.init());
+else i18n.init();
+if (typeof module !== 'undefined' && module.exports) module.exports = I18n;

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fa-minna-express-v4';
+const CACHE_NAME = 'fa-minna-express-v5';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -18,6 +18,12 @@ const urlsToCache = [
   '/404.html',
   '/assets/css/style.css',
   '/assets/css/responsive.css',
+  '/assets/css/auth.css',
+  '/assets/js/i18n.js',
+  '/assets/js/auth-scene.js',
+  '/assets/locales/en.json',
+  '/assets/locales/fr-TD.json',
+  '/assets/locales/ar-TD.json',
   '/assets/js/data.js',
   '/assets/js/utils.js',
   '/assets/js/main.js',
@@ -56,7 +62,7 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        return cache.addAll(urlsToCache);
+        return cache.addAll(urlsToCache.map(path => new URL(path.replace(/^\//, ''), self.registration.scope).href));
       })
   );
 });
