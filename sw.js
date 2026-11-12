@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fa-minna-express-v11';
+const CACHE_NAME = 'fa-minna-express-v12';
 const urlsToCache = [
   '/',
   '/index.html',

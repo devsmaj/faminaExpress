@@ -3,7 +3,7 @@
 .auth-page .fade-in { animation: none; }
 .auth-page .auth-scene { position: relative; isolation: isolate; min-height: max(760px, 100svh); display: grid; align-items: center; padding: 145px 6vw 80px; overflow: hidden; }
 .auth-video, .auth-shade { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -2; }
-.auth-video { object-fit: cover; background: #f4efe5 url('../videos/restaurant-sharing-poster.jpg') center / cover no-repeat; }
+.auth-video { object-fit: cover; object-position: 60% center; background: #f4efe5 url('https://assets.mixkit.co/videos/4385/4385-thumb-720-0.jpg') 60% center / cover no-repeat; }
 .auth-shade { z-index: -1; background: linear-gradient(90deg, #fff9edb8, #fff9ed33 48%, transparent 75%); }
 .auth-layout { display: grid; grid-template-columns: 1.1fr 1fr; align-items: center; gap: clamp(36px, 7vw, 120px); max-width: 1200px; width: 100%; margin: auto; }
 .auth-story { color: #18362a; max-width: 560px; }
@@ -64,6 +64,7 @@ html[dir='rtl'] .nav-list li { margin-left: 0; margin-inline-start: 20px; }
     .auth-page .auth-scene { padding-top: 180px; }
 }
 @media (max-width: 768px) {
+    .auth-video { object-position: 68% center; background-position: 68% center; }
     .auth-page .auth-scene { padding: 120px 22px 85px; }
     .auth-layout { grid-template-columns: 1fr; gap: 30px; }
     .auth-story { text-align: center; margin: auto; }

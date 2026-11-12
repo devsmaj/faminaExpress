@@ -1,11 +1,11 @@
 # Background footage
 
-restaurant-sharing-fullhd.mp4 and restaurant-sharing-poster.jpg:
-Breakfast with friends in a restaurant, Mixkit item 41852.
-
-Source: https://mixkit.co/free-stock-video/breakfast-with-friends-in-a-restaurant-41852/
-License: Mixkit Stock Video Free License, commercial and personal use.
+Original video: Customers in a minimalist style restaurant, Mixkit item 4385.
+Source: https://mixkit.co/free-stock-video/customers-in-a-minimalist-style-restaurant-4385/
+Video URL: https://assets.mixkit.co/videos/4385/4385-1080.mp4
+Poster URL: https://assets.mixkit.co/videos/4385/4385-thumb-720-0.jpg
+License: Mixkit Stock Video Free License (commercial and personal use).
 https://mixkit.co/license/#videoFree
 
-Downloaded 2026-11-12. Full HD 1920x1080, 8-second web loop, lightly brightened and compressed locally.
-Two friends share food at a restaurant. Hosted locally, with no dark video filter.
+Linked directly from the provider. No trimming, encoding, color changes, or video filters.
+CSS cover sizing crops the display to fill the background, with the diners favored on narrow screens.
