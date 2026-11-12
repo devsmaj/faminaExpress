@@ -1,7 +1,7 @@
 // Local, deterministic translations. Never send personal or checkout data to a translation API.
 class I18n {
     constructor() {
-        const saved = localStorage.getItem('language');
+        const saved = window.FaminaSession?.getPreference('language') || localStorage.getItem('language');
         this.currentLanguage = ['en', 'fr-TD', 'ar-TD'].includes(saved) ? saved : 'fr-TD';
         this.translations = {};
         this.observers = [];
@@ -26,7 +26,8 @@ class I18n {
             this.translations = data;
             this.currentLanguage = lang;
             this.buildTextCatalog();
-            localStorage.setItem('language', lang);
+            if (window.FaminaSession) window.FaminaSession.setPreference('language', lang);
+            else localStorage.setItem('language', lang);
             document.documentElement.lang = lang;
             document.documentElement.dir = lang === 'ar-TD' ? 'rtl' : 'ltr';
             this.updatePageTranslations();
@@ -162,7 +163,7 @@ class I18n {
 const i18n = new I18n();
 window.i18n = i18n;
 window.i18nReady = i18n.init();
-for (const method of ['alert', 'confirm']) {
+for (const method of ['confirm']) {
     const original = window[method].bind(window);
     window[method] = message => original(i18n.translateText(message));
 }

@@ -13,12 +13,12 @@ function loadComponent(elementId, componentPath) {
             document.getElementById(elementId).innerHTML = data;
             document.dispatchEvent(new CustomEvent('componentloaded'));
         })
-        .catch(error => console.error('Error loading component:', error));
+        .catch(error => { console.error('Error loading component:', error); window.FaminaNotifications.show('Could not load this page section. Please refresh and try again.', 'error'); });
 }
 
-// Show notification (simple alert for now, can be enhanced)
+// Shared five-second notifications; loaded on every page.
 function showNotification(message, type = 'info') {
-    alert(message); // Replace with toast notification if needed
+    window.FaminaNotifications.show(message, type);
 }
 
 // Get URL parameter

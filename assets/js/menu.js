@@ -60,6 +60,7 @@ async function loadData() {
         filteredItems = [...menuItems];
     } catch (error) {
         console.error('Error loading data:', error);
+        window.FaminaNotifications.show('Network error', 'error');
     }
 }
 

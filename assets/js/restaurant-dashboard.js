@@ -7,7 +7,7 @@ let currentTab = 'overview';
 
 // Initialize dashboard
 document.addEventListener('DOMContentLoaded', function() {
-    checkAuth();
+    if (!checkAuth()) return;
     setupEventListeners();
     loadDashboard();
 });
@@ -15,16 +15,28 @@ document.addEventListener('DOMContentLoaded', function() {
 // Check if user is authenticated as restaurant owner
 function checkAuth() {
     const token = localStorage.getItem('token');
-    const user = JSON.parse(localStorage.getItem('currentUser') || 'null');
+    const user = window.FaminaSession.user();
 
     if (!token || !user || user.role !== 'restaurant_owner') {
-        window.location.href = 'login.html';
-        return;
+        const container = document.querySelector('main');
+        container.querySelectorAll('button,input,select,textarea').forEach(field => field.disabled = true);
+        window.FaminaSession.rememberPage();
+        window.FaminaSession.gate(container, 'Sign in with a restaurant owner account to access this dashboard.');
+        showNotification('Sign in with a restaurant owner account to access this dashboard.', 'error');
+        return false;
     }
 
     currentRestaurant = user.restaurant;
     updateRestaurantInfo();
+    return true;
 }
+
+window.addEventListener('famina-signed-out', () => {
+    currentRestaurant = null;
+    const main = document.querySelector('main');
+    main.querySelectorAll('.tab-panel').forEach(panel => panel.hidden = true);
+    checkAuth();
+});
 
 // Setup event listeners
 function setupEventListeners() {
@@ -116,6 +128,7 @@ async function loadDashboard() {
         }
     } catch (error) {
         console.error('Error loading dashboard:', error);
+        window.FaminaNotifications.show('Network error', 'error');
     }
 }
 
@@ -180,6 +193,7 @@ async function loadMenuItems() {
         }
     } catch (error) {
         console.error('Error loading menu items:', error);
+        window.FaminaNotifications.show('Network error', 'error');
     }
 }
 
@@ -224,6 +238,7 @@ async function loadOrders() {
         }
     } catch (error) {
         console.error('Error loading orders:', error);
+        window.FaminaNotifications.show('Network error', 'error');
     }
 }
 
@@ -288,6 +303,7 @@ async function loadAnalytics() {
         }
     } catch (error) {
         console.error('Error loading analytics:', error);
+        window.FaminaNotifications.show('Network error', 'error');
     }
 }
 
@@ -428,7 +444,7 @@ function showNotification(message, type = 'info') {
     if (typeof window.showNotification === 'function' && window.showNotification !== showNotification) {
         window.showNotification(message, type);
     } else {
-        alert(message);
+        window.FaminaNotifications.show(message, typeof type === 'string' ? type : 'info');
     }
 }
 

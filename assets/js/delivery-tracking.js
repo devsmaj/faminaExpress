@@ -290,7 +290,7 @@ function showNotification(message, type = 'info') {
     if (typeof window.showNotification === 'function' && window.showNotification !== showNotification) {
         window.showNotification(message, type);
     } else {
-        alert(message);
+        window.FaminaNotifications.show(message, typeof type === 'string' ? type : 'info');
     }
 }
 

@@ -14,8 +14,8 @@ let busy = false;
 
 function authError(key) { const error = new Error(key); error.authKey = key; return error; }
 function showStatus(key) {
-    status.dataset.i18n = 'auth.errors.' + key;
-    status.textContent = window.i18n ? window.i18n.t(status.dataset.i18n, 'Please try again.') : 'Please try again.';
+    const message = window.i18n ? window.i18n.t('auth.errors.' + key, 'Please try again.') : 'Please try again.';
+    window.showNotification(message, key === 'sent' ? 'success' : 'error');
 }
 function errorKey(error) {
     const keys = {
@@ -54,10 +54,8 @@ async function finish(user) {
         });
         const data = await response.json();
         if (!response.ok) throw new Error(data.message || 'Could not create your FA-MINNA Express session.');
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('currentUser', JSON.stringify(data.user));
-        localStorage.setItem('faminaAuthProvider', 'firebase');
-        window.location.assign('profile.html');
+        window.FaminaSession.save(data.token, data.user, 'firebase');
+        window.location.assign(window.FaminaSession.returnUrl('profile.html'));
     } catch (error) {
         throw authError('server');
     } finally {

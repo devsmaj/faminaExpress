@@ -13,6 +13,7 @@ async function getCart() {
         return response.ok ? cart : [];
     } catch (error) {
         console.error('Error fetching cart:', error);
+        window.FaminaNotifications.show('Network error', 'error');
         return [];
     }
 }
@@ -170,7 +171,7 @@ if (typeof formatPrice === 'undefined') {
 
 if (typeof showNotification === 'undefined') {
     function showNotification(message, type = 'info') {
-        alert(message);
+        window.FaminaNotifications.show(message, typeof type === 'string' ? type : 'info');
     }
 }
 

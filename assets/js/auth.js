@@ -72,17 +72,15 @@ async function handleLogin(e) {
         const data = await response.json();
 
         if (response.ok) {
-            localStorage.removeItem('faminaAuthProvider');
-            localStorage.setItem('token', data.token);
-            localStorage.setItem('currentUser', JSON.stringify(data.user));
+            window.FaminaSession.save(data.token, data.user);
 
             showNotification('Login successful!');
 
             // Redirect based on user role
             if (data.user.role === 'restaurant_owner') {
-                window.location.href = 'restaurant-owner-dashboard.html';
+                window.location.href = window.FaminaSession.returnUrl('restaurant-owner-dashboard.html');
             } else {
-                window.location.href = 'profile.html';
+                window.location.href = window.FaminaSession.returnUrl('profile.html');
             }
         } else {
             showNotification(data.message || 'Login failed', 'error');

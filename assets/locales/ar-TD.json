@@ -499,7 +499,15 @@
     "New Restaurant": "مطعم جديد",
     "Customer created": "تم إنشاء حساب العميل",
     "Restaurant owner created": "تم إنشاء حساب مالك المطعم",
-    "Could not create your FA-MINNA Express session.": "تعذر إنشاء جلسة FA-MINNA Express."
+    "Could not create your FA-MINNA Express session.": "تعذر إنشاء جلسة FA-MINNA Express.",
+    "Dismiss notification": "إغلاق الإشعار",
+    "Something went wrong. Please try again.": "حدث خطأ. يرجى المحاولة مجددًا.",
+    "Please complete the required fields.": "يرجى تعبئة الحقول المطلوبة.",
+    "Please enter a valid value.": "يرجى إدخال قيمة صحيحة.",
+    "Please enter the six-digit verification code.": "يرجى إدخال رمز التحقق المكون من ستة أرقام.",
+    "Your browser could not save your preferences. Please check your browser settings.": "تعذر على متصفحك حفظ تفضيلاتك. يرجى التحقق من إعداداته.",
+    "Sign in with a restaurant owner account to access this dashboard.": "يرجى تسجيل الدخول بحساب مالك مطعم للوصول إلى لوحة التحكم.",
+    "Could not load this page section. Please refresh and try again.": "تعذر تحميل هذا القسم من الصفحة. يرجى التحديث والمحاولة مجددًا."
   },
   "preserved": [
     "FA-MINNA Express",

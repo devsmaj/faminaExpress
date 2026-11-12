@@ -499,7 +499,15 @@
     "New Restaurant": "Nouveau restaurant",
     "Customer created": "Compte client créé",
     "Restaurant owner created": "Compte restaurateur créé",
-    "Could not create your FA-MINNA Express session.": "Impossible d’ouvrir votre session FA-MINNA Express."
+    "Could not create your FA-MINNA Express session.": "Impossible d’ouvrir votre session FA-MINNA Express.",
+    "Dismiss notification": "Fermer la notification",
+    "Something went wrong. Please try again.": "Une erreur est survenue. Veuillez réessayer.",
+    "Please complete the required fields.": "Veuillez remplir les champs obligatoires.",
+    "Please enter a valid value.": "Veuillez saisir une valeur valide.",
+    "Please enter the six-digit verification code.": "Saisissez le code de vérification à six chiffres.",
+    "Your browser could not save your preferences. Please check your browser settings.": "Votre navigateur n’a pas pu enregistrer vos préférences. Vérifiez ses paramètres.",
+    "Sign in with a restaurant owner account to access this dashboard.": "Connectez-vous avec un compte restaurateur pour accéder à ce tableau de bord.",
+    "Could not load this page section. Please refresh and try again.": "Impossible de charger cette partie de la page. Actualisez et réessayez."
   },
   "preserved": [
     "FA-MINNA Express",

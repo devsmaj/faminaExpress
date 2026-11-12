@@ -499,7 +499,15 @@
     "New Restaurant": "New Restaurant",
     "Customer created": "Customer created",
     "Restaurant owner created": "Restaurant owner created",
-    "Could not create your FA-MINNA Express session.": "Could not create your FA-MINNA Express session."
+    "Could not create your FA-MINNA Express session.": "Could not create your FA-MINNA Express session.",
+    "Dismiss notification": "Dismiss notification",
+    "Something went wrong. Please try again.": "Something went wrong. Please try again.",
+    "Please complete the required fields.": "Please complete the required fields.",
+    "Please enter a valid value.": "Please enter a valid value.",
+    "Please enter the six-digit verification code.": "Please enter the six-digit verification code.",
+    "Your browser could not save your preferences. Please check your browser settings.": "Your browser could not save your preferences. Please check your browser settings.",
+    "Sign in with a restaurant owner account to access this dashboard.": "Sign in with a restaurant owner account to access this dashboard.",
+    "Could not load this page section. Please refresh and try again.": "Could not load this page section. Please refresh and try again."
   },
   "preserved": [
     "FA-MINNA Express",

@@ -88,7 +88,8 @@ async function handleCheckout(e) {
 
     if (!isUserLoggedIn()) {
         showNotification('Please login to place an order.', 'error');
-        window.location.href = 'login.html';
+        window.FaminaSession.rememberPage();
+        window.FaminaSession.gate(e.target.parentElement, 'Please login to place an order.');
         return;
     }
 
@@ -183,6 +184,7 @@ async function renderOrdersHistory() {
         `).join('');
     } catch (error) {
         console.error('Error fetching orders:', error);
+        window.FaminaNotifications.show('Network error', 'error');
         const ordersContainer = document.getElementById('orders-container');
         if (ordersContainer) {
             ordersContainer.innerHTML = '<p>Error loading orders.</p>';
@@ -264,7 +266,7 @@ if (typeof capitalize === 'undefined') {
 
 if (typeof showNotification === 'undefined') {
     function showNotification(message, type = 'info') {
-        alert(message);
+        window.FaminaNotifications.show(message, typeof type === 'string' ? type : 'info');
     }
 }
 

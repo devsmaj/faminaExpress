@@ -15,6 +15,18 @@ Locale JSON files are the source of truth. After editing them, run
 catalog provides immediate translations without any external translation service.
 Run `npm test --prefix backend` for authentication and localization checks.
 
+Interface notifications appear at the top for five seconds, with a close button.
+Hovering or keyboard focus pauses dismissal for readability. Form validation and
+Firebase failures use the same translated notifications instead of browser alerts.
+
+Sign-in stays in persistent browser storage until logout or session expiry (the
+server-issued Firebase session lasts seven days). Language and theme preferences
+also use a one-year, app-scoped SameSite=Lax cookie, marked Secure on HTTPS.
+Authentication tokens and personal details are never put in the preference cookie.
+Refresh keeps the current URL, query and fragment. Profile/dashboard visitors who
+need to sign in see an in-place prompt; successful login can return to that page.
+Browser settings that block or clear storage still control persistence.
+
 Firebase web configuration is in `assets/js/firebase.js`, connected to project
 `project-7ad92958-9f96-47a3-8f5`. The web API key is public configuration;
 never put service-account private keys in the frontend or repository.

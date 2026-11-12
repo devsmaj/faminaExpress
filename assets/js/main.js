@@ -126,7 +126,7 @@ function updateCartCount() {
 
 // Update authentication status in header
 function updateAuthStatus() {
-    const user = JSON.parse(localStorage.getItem('currentUser'));
+    const user = window.FaminaSession.user();
     const authLinks = document.getElementById('auth-links');
 
     if (authLinks) {
@@ -145,12 +145,10 @@ function updateAuthStatus() {
 
 // Logout function
 function logout() {
-    localStorage.removeItem('token');
-    localStorage.removeItem('faminaAuthProvider');
-    localStorage.removeItem('currentUser');
+    window.FaminaSession.clear();
     showNotification('Logged out successfully!');
     updateAuthStatus();
-    window.location.href = 'index.html';
+    window.dispatchEvent(new Event('famina-signed-out'));
 }
 
 // Load component function (if not available from utils)
@@ -162,7 +160,7 @@ if (typeof loadComponent === 'undefined') {
                 document.getElementById(elementId).innerHTML = data;
                 document.dispatchEvent(new CustomEvent('componentloaded'));
             })
-            .catch(error => console.error('Error loading component:', error));
+            .catch(error => { console.error('Error loading component:', error); window.FaminaNotifications.show('Could not load this page section. Please refresh and try again.', 'error'); });
     }
 }
 
@@ -182,11 +180,11 @@ function toggleTheme() {
     body.classList.toggle('dark-mode');
 
     if (body.classList.contains('dark-mode')) {
-        localStorage.setItem('theme', 'dark');
-        themeToggle.classList.add('dark');
+        window.FaminaSession.setPreference('theme', 'dark');
+        themeToggle?.classList.add('dark');
     } else {
-        localStorage.setItem('theme', 'light');
-        themeToggle.classList.remove('dark');
+        window.FaminaSession.setPreference('theme', 'light');
+        themeToggle?.classList.remove('dark');
     }
 }
 
@@ -196,7 +194,7 @@ window.updateAuthStatus = updateAuthStatus;
 
 // Load saved theme
 document.addEventListener('DOMContentLoaded', function() {
-    const savedTheme = localStorage.getItem('theme');
+    const savedTheme = window.FaminaSession.getPreference('theme');
     const themeToggle = document.querySelector('.theme-toggle');
 
     if (savedTheme === 'dark') {
@@ -208,7 +206,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // Show notification function (if not available from utils)
 if (typeof showNotification === 'undefined') {
     function showNotification(message, type = 'info') {
-        alert(message);
+        window.FaminaNotifications.show(message, typeof type === 'string' ? type : 'info');
     }
 }
 

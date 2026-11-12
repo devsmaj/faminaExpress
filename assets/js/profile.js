@@ -2,7 +2,7 @@
 (function () {
     function getCurrentUser() {
         try {
-            return JSON.parse(localStorage.getItem('currentUser') || 'null');
+            return window.FaminaSession.user();
         } catch (_) {
             return null;
         }
@@ -29,7 +29,7 @@
         if (typeof showNotification === 'function') {
             showNotification(message, type || 'info');
         } else {
-            alert(message);
+            window.FaminaNotifications.show(message, typeof type === 'string' ? type : 'info');
         }
     }
 
@@ -38,6 +38,13 @@
         return `profilePicture_${idPart}`;
     }
 
+    window.addEventListener('famina-signed-out', function () {
+        const form = document.getElementById('profile-form');
+        if (!form) return;
+        form.reset();
+        form.querySelectorAll('input,button').forEach(input => input.disabled = true);
+        window.FaminaSession.gate(form.parentElement, 'Please login to access your profile.');
+    });
     document.addEventListener('DOMContentLoaded', function () {
         const form = document.getElementById('profile-form');
         if (!form) return;
@@ -45,7 +52,9 @@
         const user = getCurrentUser();
         if (!user) {
             notify('Please login to access your profile.', 'error');
-            window.location.href = 'login.html';
+            window.FaminaSession.rememberPage();
+            window.FaminaSession.gate(form.parentElement, 'Please login to access your profile.');
+            form.querySelectorAll('input,button').forEach(input => input.disabled = true);
             return;
         }
 
