@@ -33,7 +33,7 @@ Reviewed the file inventory, all backend routes and session utilities, frontend 
 - XAF integer amounts only. No invented restaurant, price, delivery tariff, commission, tax or payment result. No business seed data; tests use clearly named fixtures in isolated databases.
 - Supabase PostgreSQL is the business source of truth. Browser uses publishable/anon key only. Node forwards verified user bearer tokens to PostgREST so RLS also applies through the API. Atomic lifecycle functions own financial mutations.
 - Airtel Money and Moov Money adapter contracts are disabled until approved Chad merchant credentials, webhook signature specifications and sandbox tests exist. Cash on delivery records amount due, not payment success; collection requires delivery evidence and admin reconciliation.
-- Routing requires an explicitly configured OSRM-compatible service with coverage verified in Abéché. No paid provider is provisioned automatically.
+- Routing requires an explicitly configured OSRM-compatible service with coverage verified in AbÃ©chÃ©. No paid provider is provisioned automatically.
 - Needed for staging: Supabase development project URL/public key, migration execution, Google OAuth and Chad-capable SMS provider, verified restaurant/menu/location/image records, real delivery zones/tariffs and commission policy, routing endpoint, approved riders. Do not put privileged keys in chat or frontend files.
 
 ## Baseline validation

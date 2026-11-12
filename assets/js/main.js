@@ -2,6 +2,7 @@
 (function () {
 
 document.addEventListener('DOMContentLoaded', function() {
+    if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).catch(()=>{});
     function refreshHeaderUI() {
         // Header is injected asynchronously; retry a few times until nodes exist.
         let attempts = 0;
@@ -71,13 +72,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Push notifications
-    if ('serviceWorker' in navigator && 'PushManager' in window) {
-        registerServiceWorker();
-        initializePushNotifications();
-        setupNotificationButton();
-    }
-
     // Page load animation: fade-in and slide down for main content
     // This applies to all pages with a <main> element
     const main = document.querySelector('main');
@@ -116,12 +110,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Update cart count in header
 function updateCartCount() {
-    const cart = JSON.parse(localStorage.getItem('cart')) || [];
-    const cartCount = cart.reduce((total, item) => total + item.quantity, 0);
-    const cartCountElement = document.getElementById('cart-count');
-    if (cartCountElement) {
-        cartCountElement.textContent = cartCount;
-    }
+    if(window.getCart && window.updateCartCount && window.updateCartCount!==updateCartCount)window.updateCartCount();
 }
 
 // Update authentication status in header
@@ -131,7 +120,9 @@ function updateAuthStatus() {
 
     if (authLinks) {
         if (user) {
+            const dashboard = { restaurant_owner: 'restaurant-owner-dashboard.html', rider: 'rider-dashboard.html', admin: 'admin-dashboard.html' }[user.role];
             authLinks.innerHTML = `
+                ${dashboard ? `<a href="${dashboard}">Dashboard</a>` : ''}
                 <a href="#" onclick="logout()" data-i18n="nav.logout">Logout</a>
             `;
         } else {
@@ -144,15 +135,10 @@ function updateAuthStatus() {
 }
 
 // Logout function
-async function logout() {
-    const loadingDone = window.FaminaLoading?.start();
-    try {
-    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-    window.FaminaSession.clear();
-    showNotification('Logged out successfully!');
-    updateAuthStatus();
-    window.dispatchEvent(new Event('famina-signed-out'));
-    } finally { loadingDone?.(); }
+async function logout(){
+ const done=window.FaminaLoading.start();
+ try{await window.Famina.ready;if(window.Famina.client){const {error}=await window.Famina.client.auth.signOut();if(error)throw error;}window.FaminaSession.clear();window.Famina.user=null;updateAuthStatus();window.dispatchEvent(new Event('famina-signed-out'));location.reload();}
+ catch(error){window.FaminaNotifications.show('Could not sign out. Please try again.','error');}finally{done();}
 }
 
 // Load component function (if not available from utils)
@@ -214,105 +200,5 @@ if (typeof showNotification === 'undefined') {
     }
 }
 
-// Register service worker for push notifications
-async function registerServiceWorker() {
-    try {
-        const registration = await navigator.serviceWorker.register('sw.js');
-        console.log('Service Worker registered successfully:', registration);
-        return registration;
-    } catch (error) {
-        console.error('Service Worker registration failed:', error);
-    }
-}
-
-// Initialize push notifications
-async function initializePushNotifications() {
-    try {
-        const registration = await navigator.serviceWorker.ready;
-
-        // Check if already subscribed
-        let subscription = await registration.pushManager.getSubscription();
-
-        if (!subscription) {
-            // Request permission and subscribe
-            const permission = await Notification.requestPermission();
-            if (permission === 'granted') {
-                subscription = await registration.pushManager.subscribe({
-                    userVisibleOnly: true,
-                    applicationServerKey: urlBase64ToUint8Array('YOUR_VAPID_PUBLIC_KEY') // Replace with your VAPID public key
-                });
-
-                // Get VAPID public key from backend
-                const vapidResponse = await fetch('http://localhost:3001/api/notifications/public-key');
-                const { publicKey } = await vapidResponse.json();
-
-                subscription = await registration.pushManager.subscribe({
-                    userVisibleOnly: true,
-                    applicationServerKey: urlBase64ToUint8Array(publicKey)
-                });
-
-                // Send subscription to backend
-                await fetch('http://localhost:3001/api/notifications/subscribe', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
-                    },
-                    body: JSON.stringify({ subscription })
-                });
-
-                showNotification('Push notifications enabled!');
-            }
-        }
-    } catch (error) {
-        console.error('Push notification initialization failed:', error);
-    }
-}
-
-// Utility function to convert VAPID key
-function urlBase64ToUint8Array(base64String) {
-    const padding = '='.repeat((4 - base64String.length % 4) % 4);
-    const base64 = (base64String + padding)
-        .replace(/-/g, '+')
-        .replace(/_/g, '/');
-
-    const rawData = window.atob(base64);
-    const outputArray = new Uint8Array(rawData.length);
-
-    for (let i = 0; i < rawData.length; ++i) {
-        outputArray[i] = rawData.charCodeAt(i);
-    }
-    return outputArray;
-}
-
-// Setup notification button
-async function setupNotificationButton() {
-    const notificationBtn = document.getElementById('notification-btn');
-    if (!notificationBtn) return;
-
-    // Check if already subscribed
-    const registration = await navigator.serviceWorker.ready;
-    const subscription = await registration.pushManager.getSubscription();
-
-    if (subscription) {
-        notificationBtn.classList.add('enabled');
-        notificationBtn.title = 'Notifications Enabled';
-    }
-
-    notificationBtn.addEventListener('click', async () => {
-        if (subscription) {
-            // Unsubscribe
-            await subscription.unsubscribe();
-            notificationBtn.classList.remove('enabled');
-            notificationBtn.title = 'Enable Notifications';
-            showNotification('Push notifications disabled');
-        } else {
-            // Subscribe
-            await initializePushNotifications();
-            notificationBtn.classList.add('enabled');
-            notificationBtn.title = 'Notifications Enabled';
-        }
-    });
-}
 
 })();

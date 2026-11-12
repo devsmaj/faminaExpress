@@ -1,0 +1,2 @@
+# Preserve upstream browser bundles; their minified strings are not application whitespace.
+assets/vendor/** -whitespace linguist-vendored

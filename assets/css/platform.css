@@ -1,0 +1,83 @@
+/* Business controls reuse the existing orange branding, cards, forms and layout. */
+.platform-map {
+  height: 320px;
+  width: 100%;
+  border-radius: 12px;
+  margin: 16px 0;
+  z-index: 0;
+}
+.platform-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.platform-fields .form-group {
+  min-width: 0;
+}
+.platform-fields input,
+.platform-fields select,
+.platform-fields textarea {
+  width: 100%;
+}
+.platform-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 16px 0;
+}
+.platform-note {
+  padding: 16px;
+  border-radius: 8px;
+  background: #fff4eb;
+  color: #623718;
+  margin: 12px 0;
+}
+.platform-list {
+  display: grid;
+  gap: 16px;
+}
+.platform-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.platform-table th,
+.platform-table td {
+  padding: 12px;
+  text-align: start;
+  border-bottom: 1px solid #eee;
+}
+.platform-scroll {
+  overflow-x: auto;
+}
+.platform-code {
+  font: 700 1.5rem monospace;
+  letter-spacing: 0.15em;
+}
+.platform-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 22px;
+  box-shadow: 0 2px 10px #0001;
+  overflow-wrap: anywhere;
+}
+.platform-status {
+  font-weight: 600;
+}
+.platform-fields fieldset {
+  min-width: 0;
+}
+button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+@media (max-width: 600px) {
+  .platform-fields {
+    grid-template-columns: 1fr;
+  }
+  .platform-map {
+    height: 260px;
+  }
+  .platform-card {
+    padding: 16px;
+  }
+}

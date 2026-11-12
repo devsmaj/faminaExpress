@@ -62,7 +62,7 @@ create table public.cart_items (
 );
 create table public.quotes (
  id uuid primary key default gen_random_uuid(), customer_id uuid not null references public.profiles,
- restaurant_id uuid not null references public.restaurants, address_id uuid not null references public.addresses,
+ restaurant_id uuid not null references public.restaurants, address_id uuid references public.addresses on delete set null,
  items jsonb not null, address jsonb not null, subtotal integer not null, delivery_fee integer not null,
  total integer not null check(total>0), commission integer not null check(commission>=0),
  distance_m integer not null check(distance_m>=0), duration_s integer not null check(duration_s>=0),
@@ -95,6 +95,7 @@ create table public.refunds (
  id uuid primary key default gen_random_uuid(), order_id uuid not null unique references public.orders,
  amount integer not null check(amount>0), reason text not null check(length(reason) between 3 and 500),
  status text not null default 'requested' check(status in ('requested','reviewed','refunded','rejected')),
+ resolution_reference text unique, resolved_by uuid references public.profiles, resolved_at timestamptz,
  created_at timestamptz not null default now()
 );
 create table public.order_events (
@@ -111,6 +112,11 @@ create table public.rider_locations (
  accuracy double precision not null check(accuracy between 0 and 1000), recorded_at timestamptz not null default now()
 );
 create table private.delivery_codes (order_id uuid primary key references public.orders, code text not null, attempts integer not null default 0);
+alter table private.delivery_codes enable row level security;
+create table public.admin_audit (
+ id bigint generated always as identity primary key, actor_id uuid not null references public.profiles,
+ action text not null, target_id uuid, data jsonb not null, created_at timestamptz not null default now()
+);
 
 create index orders_customer on public.orders(customer_id,created_at desc);
 create index orders_restaurant on public.orders(restaurant_id,status);
@@ -140,7 +146,7 @@ create trigger emit_order_event after insert or update on public.orders for each
 
 -- Every business table is default deny. Only explicit SELECT and address writes are granted.
 do $$ declare t text; begin
- foreach t in array array['profiles','restaurants','menu_items','addresses','delivery_zones','cart_items','quotes','orders','order_items','payments','refunds','order_events','notifications','rider_locations'] loop
+ foreach t in array array['profiles','restaurants','menu_items','addresses','delivery_zones','cart_items','quotes','orders','order_items','payments','refunds','order_events','notifications','rider_locations','admin_audit'] loop
   execute format('alter table public.%I enable row level security',t);
   execute format('revoke all on public.%I from anon, authenticated',t);
   execute format('grant select on public.%I to authenticated',t);
@@ -149,6 +155,7 @@ end $$;
 grant select on public.restaurants,public.menu_items to anon;
 grant insert,update,delete on public.addresses to authenticated;
 create policy profiles_read on public.profiles for select to authenticated using(id=auth.uid() or private.has_role('admin'));
+create policy audit_read on public.admin_audit for select to authenticated using(private.has_role('admin'));
 create policy restaurant_read on public.restaurants for select to anon,authenticated using(approved or private.owns_restaurant(id) or private.has_role('admin'));
 create policy menu_read on public.menu_items for select to anon,authenticated using(
  (verified and exists(select 1 from public.restaurants r where r.id=restaurant_id and approved)) or private.owns_restaurant(restaurant_id) or private.has_role('admin'));
@@ -174,6 +181,7 @@ begin
  select m.restaurant_id into rid from public.menu_items m join public.restaurants r on r.id=m.restaurant_id
  where m.id=p_item and m.available and m.verified and r.approved and r.available;
  if rid is null then raise exception 'Item unavailable'; end if;
+ if not exists(select 1 from public.cart_items where customer_id=auth.uid() and item_id=p_item) and (select count(*) from public.cart_items where customer_id=auth.uid())>=20 then raise exception 'Cart item limit exceeded'; end if;
  select m.restaurant_id into other from public.cart_items c join public.menu_items m on m.id=c.item_id where c.customer_id=auth.uid() and m.restaurant_id<>rid limit 1;
  if other is not null then raise exception 'One restaurant per order'; end if;
  select quantity into n from public.cart_items where customer_id=auth.uid() and item_id=p_item;
@@ -187,7 +195,7 @@ create function private.cart_snapshot(uid uuid) returns jsonb language sql stabl
  where c.customer_id=uid and m.available and m.verified and r.available and r.approved
 $$;
 -- Only the Node quote service can supply road distance. User JWTs cannot call this RPC.
-create function public.create_quote(p_customer uuid,p_address uuid,p_distance integer,p_duration integer,p_route jsonb) returns public.quotes language plpgsql security definer set search_path='' as $$
+create function public.create_quote(p_customer uuid,p_address uuid,p_distance integer,p_duration integer,p_route jsonb,p_context jsonb default null) returns public.quotes language plpgsql security definer set search_path='' as $$
 declare items jsonb; a public.addresses; r public.restaurants; z public.delivery_zones; q public.quotes; sub integer;
 begin
  if p_distance is null or p_duration is null or p_distance<0 or p_duration<0 or p_route->>'type'<>'LineString' then raise exception 'Invalid road route'; end if;
@@ -198,6 +206,9 @@ begin
  if items is null or jsonb_array_length(items)<>(select count(*) from public.cart_items where customer_id=p_customer) then raise exception 'Cart is empty or contains unavailable items'; end if;
  if (select count(distinct i->>'restaurant_id') from jsonb_array_elements(items) i)<>1 then raise exception 'One restaurant per order'; end if;
  select * into r from public.restaurants where id=(items->0->>'restaurant_id')::uuid;
+ if p_context is null or p_context->>'restaurantId' is distinct from r.id::text or
+ p_context->'origin' is distinct from jsonb_build_object('latitude',r.latitude,'longitude',r.longitude) or
+ p_context->'destination' is distinct from jsonb_build_object('latitude',a.latitude,'longitude',a.longitude) then raise exception 'Routing context changed; request a new quote'; end if;
  select * into z from public.delivery_zones where active and a.latitude between min_lat and max_lat and a.longitude between min_lng and max_lng
  and r.latitude between min_lat and max_lat and r.longitude between min_lng and max_lng and p_distance<=max_distance_m order by id limit 1;
  if z.id is null then raise exception 'Outside delivery zone'; end if;
@@ -236,7 +247,7 @@ begin
  return o;
 end $$;
 
-create function public.transition_order(p_order uuid,p_status text,p_reason text default '',p_code text default '') returns jsonb language plpgsql security definer set search_path='' as $$
+create function public.transition_order(p_order uuid,p_status text,p_reason text default '',p_code text default '',p_cash_confirmed boolean default false) returns jsonb language plpgsql security definer set search_path='' as $$
 declare o public.orders; allowed boolean:=false; d private.delivery_codes;
 begin
  select * into o from public.orders where id=p_order for update;
@@ -252,6 +263,7 @@ begin
  end if;
  if not allowed then raise exception 'Invalid order transition' using errcode='42501'; end if;
  if p_status='delivered' then
+  if o.payment_method='cash_on_delivery' and p_cash_confirmed is distinct from true then raise exception 'Confirm cash collection before delivery'; end if;
   select * into d from private.delivery_codes where order_id=o.id for update;
   if d.attempts>=5 then raise exception 'Delivery code locked; contact admin'; end if;
   if p_code is distinct from d.code then
@@ -286,6 +298,11 @@ begin
  insert into public.refunds(order_id,amount,reason) values(o.id,o.total,p_reason) on conflict(order_id) do update set order_id=excluded.order_id returning * into r;
  return r;
 end $$;
+create function public.stop_location(p_order uuid) returns void language plpgsql security definer set search_path='' as $$
+begin
+ if not private.has_role('rider') or not exists(select 1 from public.orders where id=p_order and rider_id=auth.uid()) then raise exception 'Assigned rider required' using errcode='42501'; end if;
+ delete from public.rider_locations where order_id=p_order and rider_id=auth.uid();
+end $$;
 
 create function public.save_menu(p_id uuid,p_restaurant uuid,p_name text,p_category text,p_description text,p_image text,p_price integer,p_available boolean) returns public.menu_items language plpgsql security definer set search_path='' as $$
 declare m public.menu_items;
@@ -306,6 +323,7 @@ create function public.admin_action(p_action text,p_id uuid,p_data jsonb) return
 declare r public.restaurants; z public.delivery_zones; o public.orders;
 begin
  if not private.has_role('admin') then raise exception 'Admin access required' using errcode='42501'; end if;
+ insert into public.admin_audit(actor_id,action,target_id,data) values(auth.uid(),p_action,p_id,p_data);
  case p_action
  when 'profile' then
   if p_id=auth.uid() then raise exception 'Cannot change own access'; end if;
@@ -338,6 +356,16 @@ begin
  when 'review_refund' then
   update public.refunds set status=case when p_data->>'status'='rejected' then 'rejected' else 'reviewed' end where id=p_id and status='requested';
   -- Reviewing a refund never claims money was returned. Provider/manual proof integration is gated.
+ when 'record_cash_refund' then
+  if length(trim(coalesce(p_data->>'reference','')))<3 or length(p_data->>'reference')>200 then raise exception 'Completed cash refund receipt required'; end if;
+  select o2.* into o from public.orders o2 join public.refunds f on f.order_id=o2.id where f.id=p_id and f.status='reviewed' for update of o2;
+  if o.id is null or o.payment_method<>'cash_on_delivery' or not exists(select 1 from public.payments where order_id=o.id and status in ('paid','collected','refund_pending')) then raise exception 'No reviewed cash refund to record'; end if;
+  update public.refunds set status='refunded',resolution_reference=trim(p_data->>'reference'),resolved_by=auth.uid(),resolved_at=now() where id=p_id;
+  update public.payments set status='refunded',updated_at=now() where order_id=o.id;
+ when 'reset_delivery_code' then
+  if not exists(select 1 from public.orders where id=p_id and status='picked_up') then raise exception 'Active delivery required'; end if;
+  update private.delivery_codes set attempts=0,code=lpad(((('x'||substr(replace(gen_random_uuid()::text,'-',''),1,8))::bit(32)::bigint)%1000000)::text,6,'0') where order_id=p_id;
+  insert into public.order_events(order_id,actor_id,status,note) values(p_id,auth.uid(),'picked_up','Delivery code reset by admin');
  else raise exception 'Unknown admin action';
  end case;
  return jsonb_build_object('ok',true);
@@ -351,13 +379,20 @@ begin
  update public.profiles set name=trim(p_name) where id=auth.uid() returning * into p;
  return p;
 end $$;
+create function public.set_restaurant_availability(p_restaurant uuid,p_available boolean) returns void language plpgsql security definer set search_path='' as $$
+begin
+ if not private.owns_restaurant(p_restaurant) then raise exception 'Restaurant access denied' using errcode='42501'; end if;
+ update public.restaurants set available=p_available where id=p_restaurant;
+end $$;
 -- Helpers may be used by policies but may never mutate privileged state from the public API.
 revoke all on all functions in schema private from public,anon,authenticated;
 grant execute on function private.has_role(text),private.is_active(),private.owns_restaurant(uuid),private.can_read_order(uuid) to anon,authenticated;
 revoke all on all functions in schema public from public,anon,authenticated;
-grant execute on function public.set_cart_item(uuid,integer,boolean),public.checkout(uuid,uuid,text),public.transition_order(uuid,text,text,text),public.delivery_code(uuid),public.share_location(uuid,double precision,double precision,double precision),public.request_refund(uuid,text),public.save_menu(uuid,uuid,text,text,text,text,integer,boolean),public.admin_action(text,uuid,jsonb) to authenticated;
-grant execute on function public.create_quote(uuid,uuid,integer,integer,jsonb) to service_role;
+grant execute on function public.set_cart_item(uuid,integer,boolean),public.checkout(uuid,uuid,text),public.transition_order(uuid,text,text,text,boolean),public.delivery_code(uuid),public.share_location(uuid,double precision,double precision,double precision),public.request_refund(uuid,text),public.save_menu(uuid,uuid,text,text,text,text,integer,boolean),public.admin_action(text,uuid,jsonb) to authenticated;
+grant execute on function public.create_quote(uuid,uuid,integer,integer,jsonb,jsonb) to service_role;
 grant execute on function public.update_profile(text) to authenticated;
+grant execute on function public.set_restaurant_availability(uuid,boolean) to authenticated;
+grant execute on function public.stop_location(uuid) to authenticated;
 -- Supabase Realtime respects SELECT RLS for every subscriber.
 do $$ declare t text; begin
  if exists(select 1 from pg_publication where pubname='supabase_realtime') then

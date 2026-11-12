@@ -90,7 +90,16 @@ class I18n {
         let record = this.records.get(node);
         if (!record) { record = {}; this.records.set(node, record); }
         const previous = record[key];
-        const source = previous && previous.last === current ? previous.source : current;
+        let source = previous && previous.last === current ? previous.source : current;
+        // Dynamically rendered controls may already use a translated label.
+        // Recover its English source so subsequent language switches remain reversible.
+        if (!previous || previous.last !== current) {
+            const normalized = this.normalize(source);
+            for (const catalog of Object.values(window.FAMINA_TRANSLATIONS || {})) {
+                const entry = Object.entries(catalog.text || {}).find(([, value]) => this.normalize(value) === normalized);
+                if (entry) { source = entry[0]; break; }
+            }
+        }
         const last = this.translateText(source);
         record[key] = { source, last };
         if (current !== last) write(last);

@@ -7,6 +7,15 @@ const root = path.resolve(__dirname, '..');
 const catalogs = Object.fromEntries(['en','fr-TD','ar-TD'].map(locale => [locale,
     JSON.parse(fs.readFileSync(path.join(root, 'assets/locales', locale + '.json'), 'utf8'))]));
 
+test('new translated business labels remain reversible after rendering',()=>{
+ const instance=createI18n('fr-TD'),node={};let value=catalogs['fr-TD'].text['Delivery Addresses'];
+ instance.localizeValue(node,'text',value,next=>value=next);
+ instance.translations=catalogs['ar-TD'];instance.buildTextCatalog();instance.localizeValue(node,'text',value,next=>value=next);
+ assert.equal(value,catalogs['ar-TD'].text['Delivery Addresses']);
+ instance.translations=catalogs.en;instance.buildTextCatalog();instance.localizeValue(node,'text',value,next=>value=next);
+ assert.equal(value,'Delivery Addresses');
+});
+
 function createI18n(locale) {
     const sandbox = {
         window: { FAMINA_TRANSLATIONS: catalogs },

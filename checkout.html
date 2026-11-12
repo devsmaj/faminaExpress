@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="assets/css/responsive.css">
     <link rel="stylesheet" href="assets/css/auth.css">
     <link rel="stylesheet" href="assets/css/notifications.css">
+    <link rel="stylesheet" href="assets/css/platform.css">
+<link rel="stylesheet" href="assets/vendor/leaflet/leaflet.css">
 </head>
 <body>
     <div id="header"></div>
@@ -19,42 +21,13 @@
                 <div class="checkout-container">
                     <div class="delivery-form">
                         <h3>Delivery Information</h3>
-                        <form id="checkout-form">
-                            <div class="form-group">
-                                <label for="name" data-i18n="auth.name">Full Name</label>
-                                <input type="text" id="name" name="name" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="email" data-i18n="auth.email">Email</label>
-                                <input type="email" id="email" name="email" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="phone">Phone Number</label>
-                                <input type="tel" id="phone" name="phone" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="address" data-i18n="checkout.delivery_address">Delivery Address</label>
-                                <input type="text" id="address" name="address" placeholder="Street address" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="city">City</label>
-                                <input type="text" id="city" name="city" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="zipCode">ZIP Code</label>
-                                <input type="text" id="zipCode" name="zipCode" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="instructions">Delivery Instructions (Optional)</label>
-                                <textarea id="instructions" name="instructions" rows="3" placeholder="Any special instructions for delivery"></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label for="card-element">Credit Card Information</label>
-                                <div id="card-element"></div>
-                                <div id="card-errors" role="alert"></div>
-                            </div>
-                            <button type="submit" class="submit-btn" data-i18n="checkout.place_order">Place Order</button>
-                        </form>
+                        <div id="address-manager"></div>
+<form id="checkout-form">
+<div class="form-group"><label for="saved-address">Choose a saved address</label><select id="saved-address" required><option value="">Choose a saved address</option></select></div>
+<div class="form-group"><label for="payment-method">Payment Method</label><select id="payment-method" name="paymentMethod"><option value="cash_on_delivery">Cash on delivery</option><option value="airtel_money" disabled>Airtel Money � unavailable</option><option value="moov_money" disabled>Moov Money � unavailable</option></select></div>
+<button type="button" class="btn-secondary" id="request-quote">Get delivery quote</button>
+<div id="checkout-map" class="platform-map"></div>
+<button type="submit" class="submit-btn" data-i18n="checkout.place_order" disabled>Place Order</button></form>
                     </div>
                     <div class="order-summary" id="order-summary">
                         <!-- Order summary will be populated by JavaScript -->
@@ -75,12 +48,15 @@
     <script src="assets/js/data.js"></script>
     <script src="assets/js/config.js"></script>
     <script src="assets/js/frontend-api.js"></script>
+    <script src="assets/vendor/supabase.js"></script>
+    <script src="assets/js/platform.js"></script>
+<script src="assets/vendor/leaflet/leaflet.js"></script>
+<script src="assets/js/maps.js"></script>
     <script src="assets/js/utils.js"></script>
     <script src="assets/js/main.js"></script>
     <script src="assets/js/cart.js"></script>
-    <script src="assets/js/auth.js"></script>
+
     <script src="assets/js/checkout.js"></script>
+<script src="assets/js/addresses.js"></script>
 </body>
 </html>
-
-

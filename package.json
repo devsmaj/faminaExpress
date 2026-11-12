@@ -1,22 +1,11 @@
 {
-  "name": "food-delivery-backend",
-  "version": "1.0.0",
-  "description": "Backend API for food delivery website",
-  "main": "server.js",
+  "name": "fa-minna-express",
+  "private": true,
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js"
-  },
-  "dependencies": {
-    "express": "^4.18.2",
-    "cors": "^2.8.5",
-    "jsonwebtoken": "^9.0.2",
-    "bcryptjs": "^2.4.3",
-    "body-parser": "^1.20.2",
-    "stripe": "^12.0.0",
-    "web-push": "^3.6.7"
-  },
-  "devDependencies": {
-    "nodemon": "^3.0.1"
+    "start": "npm --prefix backend start",
+    "test": "npm --prefix backend test",
+    "test:browser": "node scripts/browser-smoke.cjs",
+    "build:locales": "node scripts/build-locales.cjs",
+    "build:vendor": "node scripts/build-vendor.cjs"
   }
 }

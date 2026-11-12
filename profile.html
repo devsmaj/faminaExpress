@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="assets/css/responsive.css">
     <link rel="stylesheet" href="assets/css/auth.css">
     <link rel="stylesheet" href="assets/css/notifications.css">
+    <link rel="stylesheet" href="assets/css/platform.css">
+<link rel="stylesheet" href="assets/vendor/leaflet/leaflet.css">
 </head>
 <body>
     <div id="header"></div>
@@ -32,24 +34,15 @@
                         </div>
                         <div class="form-group">
                             <label for="profile-email" data-i18n="auth.email">Email</label>
-                            <input type="email" id="profile-email" name="email" required>
+                            <input type="text" id="profile-email" name="email" readonly>
                         </div>
-                        <div class="form-group">
-                            <label for="current-password">Current Password</label>
-                            <input type="password" id="current-password" name="currentPassword">
-                        </div>
-                        <div class="form-group">
-                            <label for="new-password">New Password</label>
-                            <input type="password" id="new-password" name="newPassword">
-                        </div>
-                        <div class="form-group">
-                            <label for="confirm-password">Confirm New Password</label>
-                            <input type="password" id="confirm-password" name="confirmPassword">
-                        </div>
+
+
+
                         <button type="submit" class="submit-btn">Update Profile</button>
                     </form>
                 </div>
-                <div class="mt-2">
+                <div id="address-manager"></div><div class="mt-2">
                     <a href="orders.html" class="btn">View Order History</a>
                 </div>
             </div>
@@ -67,11 +60,14 @@
     <script src="assets/js/data.js"></script>
     <script src="assets/js/config.js"></script>
     <script src="assets/js/frontend-api.js"></script>
+    <script src="assets/vendor/supabase.js"></script>
+    <script src="assets/js/platform.js"></script>
+<script src="assets/vendor/leaflet/leaflet.js"></script>
+<script src="assets/js/maps.js"></script>
     <script src="assets/js/utils.js"></script>
     <script src="assets/js/main.js"></script>
-    <script src="assets/js/auth.js"></script>
+
     <script src="assets/js/profile.js"></script>
+<script src="assets/js/addresses.js"></script>
 </body>
 </html>
-
-

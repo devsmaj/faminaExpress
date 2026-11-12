@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fa-minna-express-v14';
+const CACHE_NAME = 'fa-minna-express-platform-v1';
 const urlsToCache = [
   '/assets/js/loading.js',
   '/assets/css/loading.css',
@@ -35,7 +35,25 @@ const urlsToCache = [
   '/assets/js/utils.js',
   '/assets/js/main.js',
   '/assets/js/cart.js',
-  '/assets/js/auth.js',
+  '/assets/js/config.js',
+  '/assets/js/frontend-api.js',
+  '/assets/js/platform.js',
+  '/assets/js/supabase-auth.js',
+  '/assets/js/maps.js',
+  '/assets/js/addresses.js',
+  '/assets/js/profile.js',
+  '/assets/js/admin-dashboard.js',
+  '/assets/js/rider-dashboard.js',
+  '/assets/js/restaurant-dashboard.js',
+  '/assets/js/delivery-tracking.js',
+  '/assets/css/platform.css',
+  '/assets/vendor/supabase.js',
+  '/assets/vendor/chart.js',
+  '/assets/vendor/leaflet/leaflet.js',
+  '/assets/vendor/leaflet/leaflet.css',
+  '/admin-dashboard.html',
+  '/rider-dashboard.html',
+  '/restaurant-owner-dashboard.html',
   '/assets/icons/google.svg',
   '/assets/icons/phone.svg',
   '/assets/js/menu.js',
@@ -76,7 +94,7 @@ self.addEventListener('install', event => {
 
 // Fetch event
 self.addEventListener('fetch', event => {
-  if (event.request.method !== 'GET' || new URL(event.request.url).pathname.startsWith('/api/')) return;
+  if (event.request.method !== 'GET' || new URL(event.request.url).origin !== self.location.origin || new URL(event.request.url).pathname.startsWith('/api/')) return;
   event.respondWith(
     caches.match(event.request)
       .then(response => {
