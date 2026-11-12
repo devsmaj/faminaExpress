@@ -1,16 +1,16 @@
-.auth-page { background: #171811; }
+.auth-page { background: #f4efe5; }
 .auth-page main { opacity: 1 !important; transform: none !important; transition: none !important; }
 .auth-page .fade-in { animation: none; }
 .auth-page .auth-scene { position: relative; isolation: isolate; min-height: max(760px, 100svh); display: grid; align-items: center; padding: 145px 6vw 80px; overflow: hidden; }
 .auth-video, .auth-shade { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -2; }
-.auth-video { object-fit: cover; background: #26231e url('../videos/chef-dough-poster.jpg') center / cover no-repeat; }
-.auth-shade { z-index: -1; background: linear-gradient(90deg, #0c110cd9, #0c110c94 50%, #0c110c4d); }
+.auth-video { object-fit: cover; background: #f4efe5 url('../videos/restaurant-sharing-poster.jpg') center / cover no-repeat; }
+.auth-shade { z-index: -1; background: linear-gradient(90deg, #fff9edb8, #fff9ed33 48%, transparent 75%); }
 .auth-layout { display: grid; grid-template-columns: 1.1fr 1fr; align-items: center; gap: clamp(36px, 7vw, 120px); max-width: 1200px; width: 100%; margin: auto; }
-.auth-story { color: #fffdf5; max-width: 560px; }
-.auth-eyebrow { display: inline-flex; gap: 12px; align-items: center; color: #f8c987; text-transform: uppercase; letter-spacing: .16em; font-size: .75rem; font-weight: 700; margin-bottom: 25px; }
+.auth-story { color: #18362a; max-width: 560px; }
+.auth-eyebrow { display: inline-flex; gap: 12px; align-items: center; color: #8c3d1d; text-transform: uppercase; letter-spacing: .16em; font-size: .75rem; font-weight: 700; margin-bottom: 25px; }
 .auth-eyebrow::before { content: ''; width: 34px; height: 1px; background: currentColor; }
 .auth-story h1 { font-family: Georgia, 'Times New Roman', serif; font-size: clamp(48px, 5.6vw, 80px); line-height: 1.08; letter-spacing: -.035em; font-weight: 400; white-space: pre-line; margin: 0 0 26px; }
-.auth-story > p:last-child { color: #e1ded3; font-size: 1.08rem; line-height: 1.8; max-width: 390px; }
+.auth-story > p:last-child { color: #263e31; font-size: 1.08rem; line-height: 1.8; max-width: 390px; }
 .auth-page .auth-card.form-section { background: #fffdf8f7; border: 1px solid #ffffff80; box-shadow: 0 24px 80px #0005; border-radius: 22px; padding: clamp(28px, 3.3vw, 48px); margin: 0; max-width: 490px; width: 100%; color: #252a22; backdrop-filter: blur(16px); }
 .auth-card .container { padding: 0; width: 100%; }
 .auth-page .auth-card h2 { text-align: start; margin: 0 0 12px; font-size: 1.9rem; letter-spacing: -.03em; color: #252a22; }
@@ -52,7 +52,7 @@ html[dir='rtl'] .cart-item img, html[dir='rtl'] .menu-item img { margin-right: 0
 @media (max-width: 360px) { .header .logo a, .auth-page .logo a { font-size: 1.03rem; } .header .container { gap: 8px; } .language-toggle { padding: 7px; } }
 .language-picker select { max-width: 155px; border: 1px solid #ddd; padding: 8px 5px; border-radius: 8px; background: white; color: #333; font: inherit; font-size: .8rem; cursor: pointer; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
-html[dir='rtl'] .auth-shade { background: linear-gradient(270deg, #0c110cd9, #0c110c94 50%, #0c110c4d); }
+html[dir='rtl'] .auth-shade { background: linear-gradient(270deg, #fff9edb8, #fff9ed33 48%, transparent 75%); }
 html[dir='rtl'] .auth-story h1 { font-family: Tahoma, Arial, sans-serif; line-height: 1.35; letter-spacing: 0; }
 html[dir='rtl'] .auth-eyebrow { letter-spacing: 0; }
 html[dir='rtl'] .footer-section { text-align: start; }
@@ -71,7 +71,8 @@ html[dir='rtl'] .nav-list li { margin-left: 0; margin-inline-start: 20px; }
     .auth-story > p:last-child { font-size: .95rem; margin: auto; }
     .auth-eyebrow { font-size: .65rem; margin-bottom: 16px; }
     .auth-page .auth-card.form-section { margin: auto; padding: 28px 24px; }
-    .auth-shade { background: #101810b8; }
+    .auth-shade { background: #fff9ed33; }
+    .auth-story { background: #fffdf8e6; padding: 22px; border-radius: 18px; }
     .auth-page .logo a { font-size: 1.35rem; }
     html[dir='rtl'] .nav { right: auto; left: -100%; }
     html[dir='rtl'] .nav.active { left: 0; }
