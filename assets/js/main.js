@@ -144,11 +144,15 @@ function updateAuthStatus() {
 }
 
 // Logout function
-function logout() {
+async function logout() {
+    const loadingDone = window.FaminaLoading?.start();
+    try {
+    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
     window.FaminaSession.clear();
     showNotification('Logged out successfully!');
     updateAuthStatus();
     window.dispatchEvent(new Event('famina-signed-out'));
+    } finally { loadingDone?.(); }
 }
 
 // Load component function (if not available from utils)

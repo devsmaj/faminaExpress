@@ -34,6 +34,8 @@ document.addEventListener('languagechange', setAuthLanguage);
 async function run(action) {
     if (busy) return;
     busy = true;
+    const loadingDone = window.FaminaLoading?.start();
+    panel.setAttribute('aria-busy', 'true');
     delete status.dataset.i18n;
     status.textContent = '';
     panel.querySelectorAll('button').forEach(button => button.disabled = true);
@@ -41,6 +43,8 @@ async function run(action) {
     catch (error) { showStatus(errorKey(error)); }
     finally {
         busy = false;
+        loadingDone?.();
+        panel.removeAttribute('aria-busy');
         panel.querySelectorAll('button').forEach(button => button.disabled = false);
     }
 }
