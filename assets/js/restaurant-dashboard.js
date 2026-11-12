@@ -242,7 +242,7 @@ function displayOrders(orders) {
                 <p><strong>Customer:</strong> ${order.customerName}</p>
                 <p><strong>Items:</strong> ${order.items.length} item(s)</p>
                 <p><strong>Total:</strong> ${formatPrice(order.total)}</p>
-                <p><strong>Time:</strong> ${new Date(order.createdAt).toLocaleString()}</p>
+                <p><strong>Time:</strong> <time datetime="${order.createdAt}" data-localized-date="datetime" data-no-translate></time></p>
             </div>
             <div class="order-items">
                 ${order.items.map(item => `<span class="order-item">${item.name} x${item.quantity}</span>`).join('')}
@@ -425,8 +425,8 @@ function formatPrice(price) {
 
 function showNotification(message, type = 'info') {
     // Use existing notification system if available
-    if (typeof showNotification !== 'undefined') {
-        showNotification(message, type);
+    if (typeof window.showNotification === 'function' && window.showNotification !== showNotification) {
+        window.showNotification(message, type);
     } else {
         alert(message);
     }

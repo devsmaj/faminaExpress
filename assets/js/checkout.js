@@ -172,7 +172,7 @@ async function renderOrdersHistory() {
         ordersContainer.innerHTML = orders.reverse().map(order => `
             <div class="order-card">
                 <h3>Order #${order.id}</h3>
-                <p><strong>Date:</strong> ${new Date(order.createdAt).toLocaleDateString()}</p>
+                <p><strong>Date:</strong> <time datetime="${order.createdAt}" data-localized-date="date" data-no-translate></time></p>
                 <p><strong>Status:</strong> ${capitalize(order.status)}</p>
                 <p><strong>Total:</strong> ${formatPrice(order.total)}</p>
                 <p><strong>Items:</strong></p>

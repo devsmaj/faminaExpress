@@ -22,16 +22,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 100);
     }
 
-    // Load i18n first
-    const i18nScript = document.createElement('script');
-    i18nScript.src = 'assets/js/i18n.js';
-    i18nScript.onload = function() {
-        // Load header and footer components after i18n is loaded
-        loadComponent('header', 'components/header.html');
-        loadComponent('footer', 'components/footer.html');
-        refreshHeaderUI();
-    };
-    document.head.appendChild(i18nScript);
+    // Locale catalogs are loaded before page scripts on every page.
+    loadComponent('header', 'components/header.html');
+    loadComponent('footer', 'components/footer.html');
+    refreshHeaderUI();
 
     // Initialize cart count
     updateCartCount();

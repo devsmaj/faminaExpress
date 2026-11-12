@@ -3,10 +3,17 @@
 The sign-in pages include a locally hosted cooking video with a pause control,
 poster fallback, and reduced-motion/data-saver support. Footage credits are in
 `assets/videos/CREDITS.md`. French (Chad) is the default interface language;
-the header selector also offers Arabic (Chad), with RTL layout, and English.
-Language selection is saved in the browser. Authentication copy, errors, shared
-navigation/footer and marked interface labels are translated. Restaurant data
-and unmarked long-form page content retain their original language.
+the globe button opens a language menu with Arabic (Chad), RTL layout, and English.
+Language selection is saved in the browser. All built-in pages, help and policy
+text, menu descriptions, cart/order content, dashboard labels and messages have
+French and Arabic translations. Proper names and customer-entered values retain
+their identity. Dynamically inserted interface content is translated without
+changing form values, filter identifiers, prices or application data.
+
+Locale JSON files are the source of truth. After editing them, run
+`node scripts/build-locales.cjs` to update `assets/locales/catalog.js`. The bundled
+catalog provides immediate translations without any external translation service.
+Run `npm test --prefix backend` for authentication and localization checks.
 
 Firebase web configuration is in `assets/js/firebase.js`, connected to project
 `project-7ad92958-9f96-47a3-8f5`. The web API key is public configuration;

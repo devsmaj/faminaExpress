@@ -4,7 +4,7 @@
             <a href="index.html">FA-MINNA Express</a>
         </div>
         <nav class="nav">
-            <button class="close-menu">&times;</button>
+            <button type="button" class="close-menu" aria-label="Close menu">&times;</button>
             <ul class="nav-list">
                 <li><a href="index.html" data-i18n="nav.home">Home</a></li>
                 <li><a href="menu.html" data-i18n="menu.title">Menu</a></li>
@@ -17,20 +17,25 @@
                     <a href="login.html" data-i18n="auth.login">Login</a>
                     <a href="register.html" data-i18n="auth.register">Register</a>
                 </li>
-                <li class="language-picker">
-                    <label for="site-language" class="sr-only" data-i18n="nav.language">Language</label>
-                    <select id="site-language" data-language-select>
-                        <option value="fr-TD" lang="fr-TD">Français (Tchad)</option>
-                        <option value="ar-TD" lang="ar-TD">العربية (تشاد)</option>
-                        <option value="en" lang="en">English</option>
-                    </select>
-                </li>
             </ul>
         </nav>
-        <div class="hamburger">
-            <span></span>
-            <span></span>
-            <span></span>
+        <div class="language-picker">
+            <button type="button" class="language-toggle" data-language-toggle aria-haspopup="menu" aria-expanded="false" aria-controls="language-menu" aria-label="Choose language">
+                <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c5 5 5 13 0 18-5-5-5-13 0-18Z"/></svg>
+                <span data-language-code data-no-translate>FR</span>
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m3 4.5 3 3 3-3"/></svg>
+            </button>
+            <div id="language-menu" class="language-menu" role="menu" aria-label="Choose language" hidden>
+                <p class="language-menu-title">Choose language</p>
+                <button type="button" role="menuitemradio" data-language-choice="fr-TD" aria-checked="true" lang="fr-TD" data-no-translate><span>Français</span><small>Tchad</small></button>
+                <button type="button" role="menuitemradio" data-language-choice="ar-TD" aria-checked="false" lang="ar-TD" dir="rtl" data-no-translate><span>العربية</span><small>تشاد</small></button>
+                <button type="button" role="menuitemradio" data-language-choice="en" aria-checked="false" lang="en" data-no-translate><span>English</span></button>
+            </div>
         </div>
+        <button type="button" class="hamburger" aria-label="Open menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
     </div>
 </header>

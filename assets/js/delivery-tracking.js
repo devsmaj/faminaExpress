@@ -136,7 +136,7 @@ function displayTrackingInfo(tracking) {
 // Display order status when no tracking info available
 function displayOrderStatus(order) {
     const etaElement = document.getElementById('eta-info');
-    etaElement.textContent = `Order Status: ${order.status.replace('_', ' ').toUpperCase()}`;
+    etaElement.textContent = `Order Status: ${order.status.replaceAll('_', ' ').toUpperCase()}`;
 
     updateStatusTimeline(order.status);
 }
@@ -275,7 +275,7 @@ function callDriver() {
 function messageDriver() {
     const driverPhone = document.getElementById('driver-phone').textContent;
     if (driverPhone) {
-        const message = encodeURIComponent('Hi! I\'m tracking my FA-MINNA Express delivery. How\'s everything going?');
+        const message = encodeURIComponent(window.i18n.translateText('Hi! I\'m tracking my FA-MINNA Express delivery. How\'s everything going?'));
         window.location.href = `sms:${driverPhone}?body=${message}`;
     }
 }
@@ -287,8 +287,8 @@ function formatPrice(price) {
 
 function showNotification(message, type = 'info') {
     // Use existing notification system if available
-    if (typeof showNotification !== 'undefined') {
-        showNotification(message, type);
+    if (typeof window.showNotification === 'function' && window.showNotification !== showNotification) {
+        window.showNotification(message, type);
     } else {
         alert(message);
     }

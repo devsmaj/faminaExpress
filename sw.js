@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fa-minna-express-v5';
+const CACHE_NAME = 'fa-minna-express-v6';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -22,6 +22,7 @@ const urlsToCache = [
   '/assets/js/i18n.js',
   '/assets/js/auth-scene.js',
   '/assets/locales/en.json',
+  '/assets/locales/catalog.js',
   '/assets/locales/fr-TD.json',
   '/assets/locales/ar-TD.json',
   '/assets/js/data.js',

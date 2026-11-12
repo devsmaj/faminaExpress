@@ -244,8 +244,8 @@ function applyFilters() {
     // Search filter
     if (currentFilters.search) {
         filtered = filtered.filter(item =>
-            item.name.toLowerCase().includes(currentFilters.search) ||
-            item.description.toLowerCase().includes(currentFilters.search) ||
+            (window.i18n?.translateText(item.name) || item.name).toLowerCase().includes(currentFilters.search) || item.name.toLowerCase().includes(currentFilters.search) ||
+            (window.i18n?.translateText(item.description) || item.description).toLowerCase().includes(currentFilters.search) || item.description.toLowerCase().includes(currentFilters.search) ||
             item.category.toLowerCase().includes(currentFilters.search) ||
             restaurants.find(r => r.id === item.restaurantId)?.name.toLowerCase().includes(currentFilters.search)
         );
