@@ -11,7 +11,13 @@
     "logout": "Déconnexion",
     "about": "À propos",
     "language": "Langue",
-    "access": "Connexion / Inscription"
+    "access": "Connexion / Inscription",
+    "explore": "Explorer les plats",
+    "my_orders": "Mes commandes",
+    "my_profile": "Mon profil",
+    "track": "Suivre la commande",
+    "sign_out": "Se déconnecter",
+    "dashboard": "Tableau de bord"
   },
   "hero": {
     "title": "Vos plats préférés, livrés chez vous",
@@ -649,7 +655,20 @@
     "Reset delivery code": "Réinitialiser le code de livraison",
     "Audit Log": "Journal d’audit",
     "Unavailable item": "Article indisponible",
-    "Remove unavailable items before checkout.": "Retirez les articles indisponibles avant de commander."
+    "Remove unavailable items before checkout.": "Retirez les articles indisponibles avant de commander.",
+    "Explore Food": "Explorer les plats",
+    "My Orders": "Mes commandes",
+    "My Profile": "Mon profil",
+    "Sign out": "Se déconnecter",
+    "Main navigation": "Navigation principale",
+    "Sign in to access this page.": "Connectez-vous pour accéder à cette page.",
+    "This page is reserved for another account role.": "Cette page est réservée à un autre rôle.",
+    "Your browser could not save your cart.": "Votre navigateur n’a pas pu enregistrer votre panier.",
+    "Your guest cart is saved. Resolve unavailable or conflicting items, then retry the import.": "Votre panier invité est enregistré. Résolvez les articles indisponibles ou incompatibles, puis réessayez.",
+    "Retry saved cart": "Réessayer le panier enregistré",
+    "Cart quantity": "Quantité du panier",
+    "Cart quantity unavailable": "Quantité du panier indisponible",
+    "No active orders to track.": "Aucune commande en cours à suivre."
   },
   "preserved": [
     "FA-MINNA Express",

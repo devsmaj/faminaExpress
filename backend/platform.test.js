@@ -15,6 +15,12 @@ test("PostgreSQL security and complete cash order lifecycle", async (t) => {
       "utf8",
     ),
   );
+  await db.exec(
+    fs.readFileSync(
+      require.resolve("../supabase/migrations/202611120002_guest_cart.sql"),
+      "utf8",
+    ),
+  );
   async function as(uid, sql, params = [], role = "authenticated") {
     await db.exec("begin");
     try {
@@ -169,6 +175,54 @@ test("PostgreSQL security and complete cash order lifecycle", async (t) => {
     assert.equal((await as(id(2), "select * from cart_items"))[0].quantity, 2);
     assert.equal((await as(id(5), "select * from cart_items")).length, 0);
   });
+  await t.test(
+    "guest cart import is atomic, retry-safe and restricted to customers",
+    async () => {
+      const items = [{ itemId: menu.id, quantity: 3 }];
+      await assert.rejects(
+        rpc(id(3), "merge_guest_cart", [id(600), items]),
+        /Customer access/,
+      );
+      await assert.rejects(
+        rpc(id(6), "merge_guest_cart", [
+          id(600),
+          [{ itemId: menu.id, quantity: -2 }],
+        ]),
+        /Invalid guest quantity/,
+      );
+      await rpc(id(6), "merge_guest_cart", [id(600), items]);
+      await rpc(id(6), "merge_guest_cart", [id(600), items]);
+      assert.equal(
+        (await as(id(6), "select * from cart_items"))[0].quantity,
+        3,
+      );
+      await assert.rejects(
+        rpc(id(6), "merge_guest_cart", [
+          id(600),
+          [{ itemId: menu.id, quantity: 4 }],
+        ]),
+        /Cart import conflict/,
+      );
+      await assert.rejects(
+        rpc(id(6), "merge_guest_cart", [
+          id(601),
+          [
+            { itemId: menu.id, quantity: 1 },
+            { itemId: id(999), quantity: 1 },
+          ],
+        ]),
+        /Item unavailable/,
+      );
+      assert.equal(
+        (await as(id(6), "select * from cart_items"))[0].quantity,
+        3,
+      );
+      await assert.rejects(
+        as(id(6), "select * from cart_imports"),
+        /permission denied/,
+      );
+    },
+  );
   await t.test(
     "only quote service can supply route; no zone means no checkout",
     async () => {

@@ -6,6 +6,7 @@
     "test": "npm --prefix backend test",
     "test:browser": "node scripts/browser-smoke.cjs",
     "build:locales": "node scripts/build-locales.cjs",
-    "build:vendor": "node scripts/build-vendor.cjs"
+    "build:vendor": "node scripts/build-vendor.cjs",
+    "test:navigation": "node scripts/navigation-smoke.cjs"
   }
 }

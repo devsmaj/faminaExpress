@@ -11,7 +11,13 @@
     "logout": "Sign out",
     "about": "About us",
     "language": "Language",
-    "access": "Login / Sign up"
+    "access": "Login / Sign up",
+    "explore": "Explore Food",
+    "my_orders": "My Orders",
+    "my_profile": "My Profile",
+    "track": "Track Order",
+    "sign_out": "Sign out",
+    "dashboard": "Dashboard"
   },
   "hero": {
     "title": "Delicious Food Delivered Fast",
@@ -649,7 +655,20 @@
     "Reset delivery code": "Reset delivery code",
     "Audit Log": "Audit Log",
     "Unavailable item": "Unavailable item",
-    "Remove unavailable items before checkout.": "Remove unavailable items before checkout."
+    "Remove unavailable items before checkout.": "Remove unavailable items before checkout.",
+    "Explore Food": "Explore Food",
+    "My Orders": "My Orders",
+    "My Profile": "My Profile",
+    "Sign out": "Sign out",
+    "Main navigation": "Main navigation",
+    "Sign in to access this page.": "Sign in to access this page.",
+    "This page is reserved for another account role.": "This page is reserved for another account role.",
+    "Your browser could not save your cart.": "Your browser could not save your cart.",
+    "Your guest cart is saved. Resolve unavailable or conflicting items, then retry the import.": "Your guest cart is saved. Resolve unavailable or conflicting items, then retry the import.",
+    "Retry saved cart": "Retry saved cart",
+    "Cart quantity": "Cart quantity",
+    "Cart quantity unavailable": "Cart quantity unavailable",
+    "No active orders to track.": "No active orders to track."
   },
   "preserved": [
     "FA-MINNA Express",

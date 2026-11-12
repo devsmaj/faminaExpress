@@ -34,26 +34,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize auth status
     updateAuthStatus();
 
-    // Hamburger menu toggle (event delegation works with async-loaded header)
-    document.addEventListener('click', function(e) {
-        const hamburger = e.target.closest('.hamburger');
-        const closeMenu = e.target.closest('.close-menu');
-        const navLink = e.target.closest('.nav-list a');
-        const nav = document.querySelector('.nav');
-        const activeHamburger = document.querySelector('.hamburger');
-
-        if (hamburger && nav) {
-            nav.classList.toggle('active');
-            hamburger.classList.toggle('active');
-            return;
-        }
-
-        if ((closeMenu || navLink) && nav && activeHamburger) {
-            nav.classList.remove('active');
-            activeHamburger.classList.remove('active');
-        }
-    });
-
     // Newsletter form submission (delegated for async-loaded footer on all pages)
     document.addEventListener('submit', function(e) {
         const newsletterForm = e.target.closest('.newsletter-form');
@@ -114,31 +94,31 @@ function updateCartCount() {
 }
 
 // Update authentication status in header
-function updateAuthStatus() {
-    const user = window.FaminaSession.user();
-    const authLinks = document.getElementById('auth-links');
-
-    if (authLinks) {
-        if (user) {
-            const dashboard = { restaurant_owner: 'restaurant-owner-dashboard.html', rider: 'rider-dashboard.html', admin: 'admin-dashboard.html' }[user.role];
-            authLinks.innerHTML = `
-                ${dashboard ? `<a href="${dashboard}">Dashboard</a>` : ''}
-                <a href="#" onclick="logout()" data-i18n="nav.logout">Logout</a>
-            `;
-        } else {
-            authLinks.innerHTML = `
-                <a href="login.html" data-i18n="nav.access">Login / Sign up</a>
-            `;
-        }
-    }
-    if (window.i18n) window.i18n.updatePageTranslations();
-}
+function updateAuthStatus() { window.Famina.Navigation?.render(); }
 
 // Logout function
-async function logout(){
- const done=window.FaminaLoading.start();
- try{await window.Famina.ready;if(window.Famina.client){const {error}=await window.Famina.client.auth.signOut();if(error)throw error;}window.FaminaSession.clear();window.Famina.user=null;updateAuthStatus();window.dispatchEvent(new Event('famina-signed-out'));location.reload();}
- catch(error){window.FaminaNotifications.show('Could not sign out. Please try again.','error');}finally{done();}
+let signingOut = false;
+async function logout() {
+    if (signingOut) return;
+    signingOut = true;
+    const done = window.FaminaLoading.start();
+    const button = document.querySelector('[data-sign-out]');
+    if (button) button.disabled = true;
+    try {
+        await window.Famina.ready;
+        if (window.Famina.client) {
+            const { error } = await window.Famina.client.auth.signOut();
+            if (error) throw error;
+        }
+        await window.Famina.refreshUser(null);
+        window.Famina.Navigation?.close();
+    } catch (error) {
+        window.FaminaNotifications.show('Could not sign out. Please try again.', 'error');
+    } finally {
+        signingOut = false;
+        done();
+        if (button?.isConnected) button.disabled = false;
+    }
 }
 
 // Load component function (if not available from utils)

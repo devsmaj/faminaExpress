@@ -1,6 +1,10 @@
 // Keep all new business UI strings in the existing local catalogs.
 const fs=require('node:fs');
 const strings=[
+['Explore Food','Explorer les plats','استكشف الأطباق'],['My Orders','Mes commandes','طلباتي'],['My Profile','Mon profil','ملفي الشخصي'],['Sign out','Se déconnecter','تسجيل الخروج'],
+['Main navigation','Navigation principale','التنقل الرئيسي'],['Sign in to access this page.','Connectez-vous pour accéder à cette page.','سجّل الدخول للوصول إلى هذه الصفحة.'],['This page is reserved for another account role.','Cette page est réservée à un autre rôle.','هذه الصفحة مخصصة لدور حساب آخر.'],
+['Your browser could not save your cart.','Votre navigateur n’a pas pu enregistrer votre panier.','تعذّر على المتصفح حفظ سلتك.'],['Your guest cart is saved. Resolve unavailable or conflicting items, then retry the import.','Votre panier invité est enregistré. Résolvez les articles indisponibles ou incompatibles, puis réessayez.','سلة الزائر محفوظة. عالج الأصناف غير المتاحة أو المتعارضة ثم أعد المحاولة.'],['Retry saved cart','Réessayer le panier enregistré','أعد محاولة دمج السلة المحفوظة'],
+['Cart quantity','Quantité du panier','عدد أصناف السلة'],['Cart quantity unavailable','Quantité du panier indisponible','عدد أصناف السلة غير متاح'],['No active orders to track.','Aucune commande en cours à suivre.','لا توجد طلبات نشطة لتتبعها.'],
 ['Unavailable item','Article indisponible','صنف غير متاح'],['Remove unavailable items before checkout.','Retirez les articles indisponibles avant de commander.','أزل الأصناف غير المتاحة قبل إتمام الطلب.'],
 ['Accept Order','Accepter la commande','قبول الطلب'],['Start preparation','Commencer la préparation','بدء التحضير'],['Ready for pickup','Prête à récupérer','جاهز للاستلام'],['Confirm pickup','Confirmer la récupération','تأكيد الاستلام'],['Confirm delivery','Confirmer la livraison','تأكيد التوصيل'],
 ['Confirm delivery and cash collection?','Confirmer la livraison et la collecte des espèces ?','هل تؤكد التوصيل وتحصيل النقد؟'],

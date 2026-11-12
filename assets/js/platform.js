@@ -47,18 +47,26 @@
     const session = F.client
       ? (await F.client.auth.getSession()).data.session
       : null;
-    return request(
-      path,
-      {
-        ...options,
-        body:
-          options.body === undefined ? undefined : JSON.stringify(options.body),
-      },
-      session?.access_token,
-    );
+    try {
+      return await request(
+        path,
+        {
+          ...options,
+          body:
+            options.body === undefined
+              ? undefined
+              : JSON.stringify(options.body),
+        },
+        session?.access_token,
+      );
+    } catch (error) {
+      if (error.status === 401 && F.user) await F.refreshUser(null);
+      throw error;
+    }
   };
   F.require = async (role) => {
     await F.ready;
+    if (F.Navigation && !(await F.Navigation.protect())) return false;
     if (!F.user) {
       window.FaminaSession.rememberPage();
       window.FaminaSession.gate(
@@ -93,17 +101,30 @@
       }
     }
   };
+  let identityRevision = 0;
   F.refreshUser = async (session) => {
+    const revision = ++identityRevision;
     if (!session) {
+      const signedIn = Boolean(F.user);
       F.user = null;
       window.FaminaSession.clear();
       window.updateAuthStatus?.();
+      window.dispatchEvent(new Event("famina-auth-updated"));
+      if (signedIn) window.dispatchEvent(new Event("famina-signed-out"));
       return;
     }
-    const data = await request("/auth/me", {}, session.access_token);
+    let data;
+    try {
+      data = await request("/auth/me", {}, session.access_token);
+    } catch (error) {
+      if (revision !== identityRevision) return;
+      throw error;
+    }
+    if (revision !== identityRevision) return;
     F.user = data.user;
     window.FaminaSession.save(session.access_token, data.user, "supabase");
     window.updateAuthStatus?.();
+    window.dispatchEvent(new Event("famina-auth-updated"));
   };
   F.ready = (async () => {
     try {
@@ -127,14 +148,19 @@
       const { data, error } = await F.client.auth.getSession();
       if (error) throw error;
       await F.refreshUser(data.session);
-      F.client.auth.onAuthStateChange((event, session) => {
+      F.client.auth.onAuthStateChange(() => {
         setTimeout(
           () =>
-            F.refreshUser(session).catch((error) => {
-              F.user = null;
-              window.FaminaSession.clear();
-              F.notify(error.message, "error");
-            }),
+            F.client.auth
+              .getSession()
+              .then(({ data, error }) => {
+                if (error) throw error;
+                return F.refreshUser(data.session);
+              })
+              .catch(async (error) => {
+                await F.refreshUser(null);
+                F.notify(error.message, "error");
+              }),
           0,
         );
       });

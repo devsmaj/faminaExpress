@@ -198,7 +198,7 @@ document.addEventListener('click', async event => {
 });
 document.addEventListener('keydown', event => {
     const menu = document.getElementById('language-menu');
-    if (event.key === 'Escape' && menu && !menu.hidden) { closeLanguageMenu(true); return; }
+    if (event.key === 'Escape' && menu && !menu.hidden) { event.preventDefault(); closeLanguageMenu(true); return; }
     if (!menu || menu.hidden || !menu.contains(event.target)) return;
     const buttons = [...menu.querySelectorAll('[data-language-choice]')];
     const index = buttons.indexOf(document.activeElement);

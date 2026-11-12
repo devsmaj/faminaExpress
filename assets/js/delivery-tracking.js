@@ -8,7 +8,24 @@
     if (!(await F.require())) return;
     const id = new URLSearchParams(location.search).get("order");
     if (!id) {
-      F.notify("Choose an order to track.", "error");
+      const container = document.querySelector(".tracking-container");
+      container.innerHTML = `<h1>${F.t("Track Order")}</h1><p>${F.t("Choose an order to track.")}</p><div id="track-order-list" class="platform-list"></div><a class="btn-secondary" href="orders.html">${F.t("View All Orders")}</a>`;
+      try {
+        const rows = await F.api("/orders");
+        const active = rows.filter(
+          (order) => !["delivered", "cancelled"].includes(order.status),
+        );
+        document.getElementById("track-order-list").innerHTML = active.length
+          ? active
+              .map(
+                (order) =>
+                  `<a class="platform-card" href="delivery-tracking.html?order=${encodeURIComponent(order.id)}"><strong>${F.t("Order")} #${F.escape(order.id.slice(0, 8))}</strong><p>${F.t(order.status)}</p><span data-no-translate>${F.money(order.total)}</span></a>`,
+              )
+              .join("")
+          : `<p>${F.t("No active orders to track.")}</p>`;
+      } catch (error) {
+        F.notify(error.message, "error");
+      }
       return;
     }
     map = F.makeMap("map");

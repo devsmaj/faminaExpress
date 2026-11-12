@@ -25,7 +25,14 @@
     const { data } = await F.client.auth.getSession();
     if (data.session) {
       await F.refreshUser(data.session);
-      location.href = window.FaminaSession.returnUrl("profile.html");
+      await F.Cart?.merge();
+      const fallback =
+        {
+          restaurant_owner: "restaurant-owner-dashboard.html",
+          rider: "rider-dashboard.html",
+          admin: "admin-dashboard.html",
+        }[F.user?.role] || "profile.html";
+      location.href = window.FaminaSession.returnUrl(fallback);
     }
   };
   document.getElementById("google-continue").addEventListener("click", () =>

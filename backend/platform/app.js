@@ -218,6 +218,32 @@ function createApp({
       );
     }),
   );
+  app.post(
+    "/api/cart/merge",
+    role("customer"),
+    run(async (req, res) => {
+      if (
+        !Array.isArray(req.body.items) ||
+        req.body.items.length < 1 ||
+        req.body.items.length > 20
+      )
+        throw new ApiError(400, "Invalid guest cart");
+      const items = req.body.items.map((item) => {
+        if (!item || typeof item !== "object" || Array.isArray(item))
+          throw new ApiError(400, "Invalid guest cart");
+        return {
+          itemId: uuid(item.itemId),
+          quantity: integer(item.quantity, 1, 50),
+        };
+      });
+      await db.rpc(
+        "merge_guest_cart",
+        { p_key: uuid(req.body.importKey), p_items: items },
+        req.token,
+      );
+      res.json({ ok: true });
+    }),
+  );
   for (const [method, path, add] of [
     ["post", "/api/cart", true],
     ["put", "/api/cart/:id", false],

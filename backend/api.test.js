@@ -87,6 +87,16 @@ test("protected API rejects forged identity, amounts and role escalation", async
         (await post("/api/cart", { itemId: id, quantity })).status,
         400,
       );
+    for (const items of [
+      [],
+      [null],
+      [{ itemId: id, quantity: -1 }],
+      [{ itemId: "bad", quantity: 1 }],
+    ])
+      assert.equal(
+        (await post("/api/cart/merge", { importKey: id, items })).status,
+        400,
+      );
     assert.equal(
       (
         await post("/api/orders", {
@@ -116,6 +126,20 @@ test("protected API rejects forged identity, amounts and role escalation", async
     assert.deepEqual(calls[0], {
       name: "checkout",
       args: { p_quote: id, p_key: id, p_method: "cash_on_delivery" },
+      token: "valid",
+    });
+    assert.equal(
+      (
+        await post("/api/cart/merge", {
+          importKey: id,
+          items: [{ itemId: id, quantity: 2, price: 1, total: 1 }],
+        })
+      ).status,
+      200,
+    );
+    assert.deepEqual(calls[1], {
+      name: "merge_guest_cart",
+      args: { p_key: id, p_items: [{ itemId: id, quantity: 2 }] },
       token: "valid",
     });
     const config = await (await fetch(base + "/api/config")).json();

@@ -3,22 +3,21 @@
         <div class="logo">
             <a href="index.html">FA-MINNA Express</a>
         </div>
-        <nav class="nav">
+        <nav class="nav" id="primary-navigation" aria-label="Main navigation">
+            <a class="mobile-menu-brand" href="index.html" data-no-translate>FA-MINNA Express</a>
             <button type="button" class="close-menu" aria-label="Close menu">&times;</button>
             <ul class="nav-list">
                 <li><a href="index.html" data-i18n="nav.home">Home</a></li>
-                <li><a href="menu.html" data-i18n="menu.title">Menu</a></li>
+                <li><a href="menu.html" data-i18n="nav.explore">Explore Food</a></li>
                 <li><a href="restaurant.html" data-i18n="nav.restaurants">Restaurants</a></li>
                 <li><a href="about.html" data-i18n="nav.about">About Us</a></li>
                 <li><a href="cart.html"><span data-i18n="nav.cart">Cart</span> <span id="cart-count">0</span></a></li>
-                <li><a href="orders.html" data-i18n="nav.orders">Orders</a></li>
-                <li><a href="profile.html" data-i18n="nav.profile">Profile</a></li>
             </ul>
         <div class="header-actions">
         <div class="language-picker">
             <button type="button" class="language-toggle" data-language-toggle aria-haspopup="menu" aria-expanded="false" aria-controls="language-menu" aria-label="Choose language">
                 <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c5 5 5 13 0 18-5-5-5-13 0-18Z"/></svg>
-                <span data-language-code data-no-translate>FR</span>
+                <span data-language-code data-no-translate>FR</span><span class="mobile-language-name" data-no-translate>Français</span>
                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m3 4.5 3 3 3-3"/></svg>
             </button>
             <div id="language-menu" class="language-menu" role="menu" aria-label="Choose language" hidden>
@@ -33,10 +32,11 @@
         </div>
         </div>
         </nav>
-        <button type="button" class="hamburger" aria-label="Open menu">
+        <button type="button" class="hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="primary-navigation">
             <span></span>
             <span></span>
             <span></span>
         </button>
     </div>
+    <button type="button" class="nav-backdrop" aria-label="Close menu" tabindex="-1" hidden></button>
 </header>

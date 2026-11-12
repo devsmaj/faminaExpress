@@ -11,7 +11,13 @@
     "logout": "تسجيل الخروج",
     "about": "من نحن",
     "language": "اللغة",
-    "access": "دخول / إنشاء حساب"
+    "access": "دخول / إنشاء حساب",
+    "explore": "استكشف الأطباق",
+    "my_orders": "طلباتي",
+    "my_profile": "ملفي الشخصي",
+    "track": "تتبع الطلب",
+    "sign_out": "تسجيل الخروج",
+    "dashboard": "لوحة التحكم"
   },
   "hero": {
     "title": "أطباقك المفضلة تصلك إلى بابك",
@@ -649,7 +655,20 @@
     "Reset delivery code": "إعادة تعيين رمز التوصيل",
     "Audit Log": "سجل التدقيق",
     "Unavailable item": "صنف غير متاح",
-    "Remove unavailable items before checkout.": "أزل الأصناف غير المتاحة قبل إتمام الطلب."
+    "Remove unavailable items before checkout.": "أزل الأصناف غير المتاحة قبل إتمام الطلب.",
+    "Explore Food": "استكشف الأطباق",
+    "My Orders": "طلباتي",
+    "My Profile": "ملفي الشخصي",
+    "Sign out": "تسجيل الخروج",
+    "Main navigation": "التنقل الرئيسي",
+    "Sign in to access this page.": "سجّل الدخول للوصول إلى هذه الصفحة.",
+    "This page is reserved for another account role.": "هذه الصفحة مخصصة لدور حساب آخر.",
+    "Your browser could not save your cart.": "تعذّر على المتصفح حفظ سلتك.",
+    "Your guest cart is saved. Resolve unavailable or conflicting items, then retry the import.": "سلة الزائر محفوظة. عالج الأصناف غير المتاحة أو المتعارضة ثم أعد المحاولة.",
+    "Retry saved cart": "أعد محاولة دمج السلة المحفوظة",
+    "Cart quantity": "عدد أصناف السلة",
+    "Cart quantity unavailable": "عدد أصناف السلة غير متاح",
+    "No active orders to track.": "لا توجد طلبات نشطة لتتبعها."
   },
   "preserved": [
     "FA-MINNA Express",
