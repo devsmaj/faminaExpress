@@ -1,0 +1,12 @@
+# GitHub Pages serves the static frontend. Backend code and dependency docs
+# must not be parsed as Liquid templates or copied into the published site.
+exclude:
+  - backend
+  - node_modules
+  - README.md
+  - FIREBASE_SETUP.md
+  - package.json
+  - package-lock.json
+  - Gemfile
+  - Gemfile.lock
+  - vendor
