@@ -343,12 +343,21 @@ begin
  return jsonb_build_object('ok',true);
 end $$;
 
+create function public.update_profile(p_name text) returns public.profiles language plpgsql security definer set search_path='' as $$
+declare p public.profiles;
+begin
+ if not private.is_active() then raise exception 'Account access denied' using errcode='42501'; end if;
+ if length(trim(p_name))<1 or length(p_name)>100 then raise exception 'Invalid name'; end if;
+ update public.profiles set name=trim(p_name) where id=auth.uid() returning * into p;
+ return p;
+end $$;
 -- Helpers may be used by policies but may never mutate privileged state from the public API.
 revoke all on all functions in schema private from public,anon,authenticated;
 grant execute on function private.has_role(text),private.is_active(),private.owns_restaurant(uuid),private.can_read_order(uuid) to anon,authenticated;
 revoke all on all functions in schema public from public,anon,authenticated;
 grant execute on function public.set_cart_item(uuid,integer,boolean),public.checkout(uuid,uuid,text),public.transition_order(uuid,text,text,text),public.delivery_code(uuid),public.share_location(uuid,double precision,double precision,double precision),public.request_refund(uuid,text),public.save_menu(uuid,uuid,text,text,text,text,integer,boolean),public.admin_action(text,uuid,jsonb) to authenticated;
 grant execute on function public.create_quote(uuid,uuid,integer,integer,jsonb) to service_role;
+grant execute on function public.update_profile(text) to authenticated;
 -- Supabase Realtime respects SELECT RLS for every subscriber.
 do $$ declare t text; begin
  if exists(select 1 from pg_publication where pubname='supabase_realtime') then
