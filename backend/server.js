@@ -9,6 +9,8 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(bodyParser.json());
 
+app.get('/health', (req, res) => res.json({ status: 'ok' }));
+
 // Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/restaurants', require('./routes/restaurants'));
@@ -18,8 +20,8 @@ app.use('/api/orders', require('./routes/orders'));
 app.use('/api/restaurant-owner', require('./routes/restaurant-owner'));
 app.use('/api/payments', require('./routes/payments'));
 app.use('/api/notifications', require('./routes/notifications'));
-app.use('/api/payments', require('./routes/payments'));
 
-app.listen(PORT, () => {
+
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running on port ${PORT}`);
 });

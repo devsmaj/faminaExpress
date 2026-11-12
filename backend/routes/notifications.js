@@ -2,18 +2,23 @@ const sessionSecret = require('../session-secret');
 const express = require('express');
 const webpush = require('web-push');
 const router = express.Router();
+const jwt = require('jsonwebtoken');
 
-// VAPID keys (generate your own in production)
-const vapidKeys = {
-  publicKey: 'YOUR_VAPID_PUBLIC_KEY',
-  privateKey: 'YOUR_VAPID_PRIVATE_KEY'
-};
-
-webpush.setVapidDetails(
-  'mailto:your-email@example.com',
-  vapidKeys.publicKey,
-  vapidKeys.privateKey
-);
+// Push notifications are optional and must never prevent the API from starting.
+const vapidKeys = { publicKey: process.env.VAPID_PUBLIC_KEY, privateKey: process.env.VAPID_PRIVATE_KEY };
+let pushEnabled = false;
+if (vapidKeys.publicKey && vapidKeys.privateKey && process.env.VAPID_SUBJECT) {
+  try {
+    webpush.setVapidDetails(process.env.VAPID_SUBJECT, vapidKeys.publicKey, vapidKeys.privateKey);
+    pushEnabled = true;
+  } catch (_) {
+    console.warn('Push notifications disabled: invalid VAPID configuration.');
+  }
+}
+router.use((req, res, next) => {
+  if (!pushEnabled) return res.status(503).json({ message: 'Push notifications are not configured.' });
+  next();
+});
 
 // In-memory storage for subscriptions (use database in production)
 let subscriptions = [];
@@ -84,4 +89,17 @@ router.get('/public-key', (req, res) => {
   res.json({ publicKey: vapidKeys.publicKey });
 });
 
+// Orders can call this even when optional push credentials are absent.
+router.sendToUser = async (userId, title, body) => {
+  if (!pushEnabled) return;
+  const payload = JSON.stringify({ title, body });
+  await Promise.all(subscriptions.filter(subscription => subscription.userId === userId).map(subscription =>
+    webpush.sendNotification(subscription, payload).catch(error => {
+      if ([404, 410].includes(error.statusCode)) {
+        subscriptions = subscriptions.filter(sub => sub.endpoint !== subscription.endpoint);
+      }
+      console.warn('Optional push delivery failed:', error.statusCode || 'network error');
+    })
+  ));
+};
 module.exports = router;

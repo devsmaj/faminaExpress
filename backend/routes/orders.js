@@ -2,22 +2,7 @@ const sessionSecret = require('../session-secret');
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
-const webpush = require('web-push');
-
-// VAPID keys (should match notifications.js)
-const vapidKeys = {
-  publicKey: 'YOUR_VAPID_PUBLIC_KEY',
-  privateKey: 'YOUR_VAPID_PRIVATE_KEY'
-};
-
-webpush.setVapidDetails(
-  'mailto:your-email@example.com',
-  vapidKeys.publicKey,
-  vapidKeys.privateKey
-);
-
-// In-memory storage for subscriptions (use database in production)
-let subscriptions = [];
+const { sendToUser } = require('./notifications');
 
 const orders = [];
 
@@ -72,7 +57,9 @@ router.post('/', authenticate, (req, res) => {
   orders.push(order);
 
   // Send push notification for new order
-  sendPushNotification(order.userId, 'Order Placed', `Your order #${order.id} has been placed successfully!`);
+  sendToUser(order.userId, 'Order Placed', `Your order #${order.id} has been placed successfully!`).catch(error => {
+    console.error('Optional order notification failed:', error.message);
+  });
 
   res.json(order);
 });

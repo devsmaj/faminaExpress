@@ -39,6 +39,11 @@ never put service-account private keys in the frontend or repository.
    the server environment, then run `npm start`. This server uses Firebase Admin
    to verify signed ID tokens for this project; no service-account key is needed
    for public-key token verification. Never enable the Auth emulator in production.
+
+   Push notifications are optional. Missing or invalid VAPID configuration disables
+   only those endpoints; it does not block startup, Google/phone login, or orders.
+   For push, configure VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY and VAPID_SUBJECT in the
+   server environment. Use GET /health to check a Render deployment is running.
 5. Configure `assets/js/config.js` with your hosted HTTPS backend API URL if it
    is separate from your website, e.g. `https://api.example.com/api`. The default
    is `/api` on the website origin; local development uses localhost:3001.
