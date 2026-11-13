@@ -4,23 +4,35 @@
   let sentPhone = "",
     resendAt = 0,
     busy = false;
-  const action = (fn, button) => {
-    if (busy) return;
+  let leaving = false, releaseAction = () => {};
+  const action = async (fn, button) => {
+    if (busy || button?.disabled) return;
     busy = true;
-    return F.busy(button, async () => {
-      panel.setAttribute("aria-busy", "true");
-      panel.querySelectorAll("button").forEach((b) => (b.disabled = true));
-      try {
-        await F.ready;
-        if (!F.client) throw Error("Authentication setup is incomplete.");
-        await fn();
-      } finally {
-        busy = false;
-        panel.removeAttribute("aria-busy");
-        panel.querySelectorAll("button").forEach((b) => (b.disabled = false));
-      }
-    });
+    const original = [...panel.querySelectorAll("button")].map(b => [b, b.disabled]);
+    const buttonDone = window.FaminaLoading.button(button);
+    panel.setAttribute("aria-busy", "true");
+    original.forEach(([b]) => b.disabled = true);
+    releaseAction = () => {
+      original.forEach(([b, disabled]) => b.disabled = disabled);
+      buttonDone();
+      panel.removeAttribute("aria-busy");
+      busy = false;
+      leaving = false;
+    };
+    try {
+      await F.ready;
+      if (!F.client) throw Error("Authentication setup is incomplete.");
+      await fn();
+    } catch (error) {
+      leaving = false;
+      F.notify(error.message, "error");
+    } finally {
+      if (!leaving) releaseAction();
+    }
   };
+  window.addEventListener("pageshow", event => {
+    if (event.persisted) releaseAction();
+  });
   const finish = async () => {
     const { data } = await F.client.auth.getSession();
     if (!data.session) throw Error("Please sign in again.");
@@ -37,16 +49,24 @@
         }[F.user?.role] || "customer-home.html";
       const destination = window.FaminaSession.returnUrl(fallback);
       const target = new URL(destination, location.href);
+      leaving = true;
       location.href = F.user?.role === "customer" && /\/(index\.html)?$/.test(target.pathname) ? "customer-home.html" : destination;
     }
   };
   document.getElementById("google-continue").addEventListener("click", () =>
     action(async () => {
-      const { error } = await F.client.auth.signInWithOAuth({
+      const { data, error } = await F.client.auth.signInWithOAuth({
         provider: "google",
-        options: { redirectTo: new URL("login.html", location.href).href },
+        options: { redirectTo: new URL("login.html", location.href).href, skipBrowserRedirect: true },
       });
       if (error) throw error;
+      if (!data?.url) throw Error("Google sign-in is unavailable. Please try again.");
+      const destination = new URL(data.url);
+      if (!["https:", "http:"].includes(destination.protocol)) throw Error("Invalid sign-in address.");
+      leaving = true;
+      // Let the button paint, then retain its spinner through the browser handoff.
+      await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+      location.assign(destination.href);
     }, document.getElementById("google-continue")),
   );
   document.getElementById("phone-continue").addEventListener("click", () => {

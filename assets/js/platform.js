@@ -88,14 +88,12 @@
   };
   F.busy = async (button, action) => {
     if (button?.disabled) return;
-    const done = window.FaminaLoading.start();
     const buttonDone = window.FaminaLoading.button(button);
     try {
       return await action();
     } catch (error) {
       F.notify(error.message, "error");
     } finally {
-      done();
       buttonDone();
     }
   };

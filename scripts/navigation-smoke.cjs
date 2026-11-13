@@ -111,7 +111,7 @@ app.get("/api/orders", (q, s) => {
 app.get("/api/addresses", (q, s) => s.json([]));
 app.get("/api/notifications", (q, s) => s.json([]));
 app.use(express.static(path.resolve(__dirname, "..")));
-const sdk = `window.supabase={createClient:()=>{let listener;const session=()=>{const role=localStorage.getItem('TEST_ROLE');return role?{access_token:role}:null};window.TEST_AUTH=role=>{if(role)localStorage.setItem('TEST_ROLE',role);else localStorage.removeItem('TEST_ROLE');listener?.(role?'SIGNED_IN':'SIGNED_OUT',session());};return {auth:{getSession:async()=>({data:{session:session()}}),onAuthStateChange:fn=>{listener=fn;return {data:{subscription:{unsubscribe(){}}}}},signInWithOAuth:async()=>{if(window.TEST_OAUTH_FAIL)return {error:Error("TEST Google unavailable")};localStorage.setItem('TEST_ROLE','customer');location.href='login.html?code=TEST';return {error:null};},signOut:async()=>{if(window.TEST_SIGN_OUT_WAIT)await new Promise(resolve=>window.TEST_RESOLVE_SIGN_OUT=resolve);if(window.TEST_SIGN_OUT_FAIL)return {error:Error('TEST sign-out failure')};localStorage.removeItem('TEST_ROLE');listener?.('SIGNED_OUT',null);return {error:null};}},channel:()=>({on(){return this},subscribe(fn){fn?.('SUBSCRIBED');return this}}),removeChannel(){}}}};`;
+const sdk = `window.supabase={createClient:()=>{let listener;const session=()=>{const role=localStorage.getItem('TEST_ROLE');return role?{access_token:role}:null};window.TEST_AUTH=role=>{if(role)localStorage.setItem('TEST_ROLE',role);else localStorage.removeItem('TEST_ROLE');listener?.(role?'SIGNED_IN':'SIGNED_OUT',session());};return {auth:{getSession:async()=>({data:{session:session()}}),onAuthStateChange:fn=>{listener=fn;return {data:{subscription:{unsubscribe(){}}}}},signInWithOAuth:async options=>{window.TEST_OAUTH_OPTIONS=options;window.TEST_OAUTH_CALLS=(window.TEST_OAUTH_CALLS||0)+1;if(window.TEST_OAUTH_FAIL)return {error:Error("TEST Google unavailable")};localStorage.setItem('TEST_ROLE','customer');return {data:{url:new URL('login.html?code=TEST',location.href).href},error:null};},signOut:async()=>{if(window.TEST_SIGN_OUT_WAIT)await new Promise(resolve=>window.TEST_RESOLVE_SIGN_OUT=resolve);if(window.TEST_SIGN_OUT_FAIL)return {error:Error('TEST sign-out failure')};localStorage.removeItem('TEST_ROLE');listener?.('SIGNED_OUT',null);return {error:null};}},channel:()=>({on(){return this},subscribe(fn){fn?.('SUBSCRIBED');return this}}),removeChannel(){}}}};`;
 (async () => {
   const server = app.listen(0, "127.0.0.1");
   await new Promise((r) => server.once("listening", r));
@@ -297,8 +297,25 @@ const sdk = `window.supabase={createClient:()=>{let listener;const session=()=>{
     await page.waitForSelector(".toast-error");
     assert.equal(await page.evaluate(() => sessionStorage.getItem("famina-login-success")), null);
     assert.equal(await page.locator(".toast-success").count(), 0);
-    await page.evaluate(() => window.TEST_OAUTH_FAIL = false);
-    await page.click("#google-continue");
+    await page.evaluate(() => {window.TEST_OAUTH_FAIL = false;window.TEST_OAUTH_CALLS=0;});
+    await page.evaluate(() => {
+      window.TEST_HOLD_GOOGLE = true;
+      navigation.addEventListener("navigate", event => {
+        if (window.TEST_HOLD_GOOGLE && event.destination.url.includes("login.html?code=TEST")) {
+          event.preventDefault(); window.TEST_GOOGLE_DESTINATION=event.destination.url;
+        }
+      });
+    });
+    await page.locator("#google-continue").evaluate(button => button.click());
+    await page.waitForFunction(() => Boolean(window.TEST_GOOGLE_DESTINATION));
+    assert.equal(await page.locator("#google-continue").isDisabled(),true);
+    assert.equal(await page.locator("#google-continue .button-loading-ring").isVisible(),true);
+    assert.equal(await page.locator("#google-continue").getAttribute("aria-busy"),"true");
+    assert.equal(await page.locator(".loading-indicator:not([hidden])").count(),0);
+    assert.equal(await page.evaluate(()=>window.TEST_OAUTH_OPTIONS.options.skipBrowserRedirect),true);
+    await page.locator("#google-continue").evaluate(button=>button.click());
+    assert.equal(await page.evaluate(()=>window.TEST_OAUTH_CALLS),1);
+    await page.evaluate(()=>{window.TEST_HOLD_GOOGLE=false;location.assign(window.TEST_GOOGLE_DESTINATION);});
     await page.waitForURL("**/cart.html");
     await ready(page);
     await page.waitForFunction(

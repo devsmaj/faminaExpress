@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fa-minna-express-platform-v4';
+const CACHE_NAME = 'fa-minna-express-platform-v5';
 const urlsToCache = [
   '/assets/js/loading.js',
   '/assets/css/loading.css',
@@ -91,7 +91,8 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        return cache.addAll(urlsToCache.map(path => new URL(path.replace(/^\//, ''), self.registration.scope).href));
+        return cache.addAll(urlsToCache.map(path => new URL(path.replace(/^\//, ''), self.registration.scope).href))
+          .then(() => self.skipWaiting());
       })
   );
 });
@@ -114,12 +115,12 @@ self.addEventListener('activate', event => {
     caches.keys().then(cacheNames => {
       return Promise.all(
         cacheNames.map(cacheName => {
-          if (cacheName !== CACHE_NAME) {
+          if (cacheName.startsWith('fa-minna-express-') && cacheName !== CACHE_NAME) {
             return caches.delete(cacheName);
           }
         })
       );
-    })
+    }).then(() => self.clients.claim())
   );
 });
 

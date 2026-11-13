@@ -81,7 +81,7 @@ async function logout() {
     const no = dialog.querySelector('[data-cancel-sign-out]'), yes = dialog.querySelector('[data-confirm-sign-out]');
     no.textContent = t('No'); yes.textContent = t('Yes');
     document.body.append(dialog);
-    let pending = false, done = () => {}, buttonDone = () => {};
+    let pending = false, buttonDone = () => {};
     try {
         const confirmed = await new Promise(resolve => {
             no.onclick = () => resolve(false);
@@ -93,7 +93,6 @@ async function logout() {
         if (!confirmed) return;
         pending = true;
         no.disabled = true;
-        done = window.FaminaLoading.start();
         buttonDone = window.FaminaLoading.button(yes);
         await F.ready;
         if (!F.client) throw Error('Authentication setup is incomplete.');
@@ -103,7 +102,7 @@ async function logout() {
     } catch (error) {
         window.FaminaNotifications.show('Could not sign out. Please try again.', 'error');
     } finally {
-        buttonDone(); done();
+        buttonDone();
         dialog.close(); dialog.remove();
         signingOut = false;
         const focus = document.querySelector('[data-sign-out],#auth-links a');

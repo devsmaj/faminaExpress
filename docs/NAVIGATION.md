@@ -31,3 +31,9 @@ All pages load skeleton CSS in the head and enable first-paint placeholders befo
 Same-origin page navigation shows placeholders immediately; returning through the browser back/forward cache restores the content. Initial content is inert and aria-busy, skeleton artwork is hidden from screen readers behind one loading status, and reduced-motion preferences disable shimmer. Subsequent mutations retain inline button loading without replacing the entire page. Header requests time out and show a readable error rather than an endless skeleton. Removed forced page fade/slide animation and duplicate homepage directory fetch. Service-worker cache updated to platform-v4.
 
 Browser checks deliberately hold a menu response, verify the skeleton remains, then verify successful and failed responses release it. A separate header failure check verifies the header placeholder is removed and static page content remains accessible. Existing auth, cart, checkout, role and EN/FR/AR layout checks remain applicable.
+
+## Google redirect button loading
+
+Google OAuth requests skipBrowserRedirect and explicitly navigates to the SDK-returned URL after the button can paint. The selected button remains disabled with its inline spinner throughout the browser handoff and final verified-login redirect; failures restore the original button states, and a back/forward-cache return resets the auth panel. Auth requests and shared action handlers no longer start a separate floating spinner. Provider buttons use a high-contrast spinner at their inline end.
+
+The browser regression test holds the Google navigation using the browser navigation event after the SDK resolves, verifies the button is still busy and visible with no floating indicator, rejects a duplicate click, then resumes login and checks the verified success alert. Cache platform-v5 activates after successful precaching and claims clients without forcing a reload; cache cleanup is limited to FA-MINNA cache names.
