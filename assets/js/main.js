@@ -52,40 +52,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Page load animation: fade-in and slide down for main content
-    // This applies to all pages with a <main> element
-    const main = document.querySelector('main');
-    if (main) {
-        // Start with hidden state
-        main.style.opacity = '0';
-        main.style.transform = 'translateY(20px)';
-        main.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+    // Content appears immediately when its real data is ready; no entrance delay.
 
-        // Trigger animation after a short delay to ensure rendering
-        setTimeout(() => {
-            main.style.opacity = '1';
-            main.style.transform = 'translateY(0)';
-        }, 100);
-    }
-
-    // Add fade-in animation on scroll for sections
-    const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('fade-in');
-            }
-        });
-    }, observerOptions);
-
-    // Observe sections
-    document.querySelectorAll('section').forEach(section => {
-        observer.observe(section);
-    });
 });
 
 // Update cart count in header
@@ -143,18 +111,7 @@ async function logout() {
     }
 }
 
-// Load component function (if not available from utils)
-if (typeof loadComponent === 'undefined') {
-    function loadComponent(elementId, componentPath) {
-        fetch(componentPath)
-            .then(response => response.text())
-            .then(data => {
-                document.getElementById(elementId).innerHTML = data;
-                document.dispatchEvent(new CustomEvent('componentloaded'));
-            })
-            .catch(error => { console.error('Error loading component:', error); window.FaminaNotifications.show('Could not load this page section. Please refresh and try again.', 'error'); });
-    }
-}
+// Shared component loading is provided by utils.js on every page.
 
 // Validate email function (if not available from utils)
 if (typeof validateEmail === 'undefined') {

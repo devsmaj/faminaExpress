@@ -7,5 +7,4 @@ document.addEventListener("DOMContentLoaded", () => {
           `<a class="category-card" href="menu.html?category=${c.id}"><img src="${c.image}" alt="${c.name}"><h3>${c.name}</h3></a>`,
       )
       .join("");
-  window.renderRestaurants?.();
 });

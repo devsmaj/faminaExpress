@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fa-minna-express-platform-v3';
+const CACHE_NAME = 'fa-minna-express-platform-v4';
 const urlsToCache = [
   '/assets/js/loading.js',
   '/assets/css/loading.css',

@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="assets/css/auth.css">
     <link rel="stylesheet" href="assets/css/notifications.css">
     <link rel="stylesheet" href="assets/css/platform.css">
+    <script>document.documentElement.classList.add('page-loading', 'header-loading');</script>
+    <link rel="stylesheet" href="assets/css/loading.css">
 </head>
 <body>
     <div id="header"></div>
@@ -61,8 +63,7 @@
 
     <div id="footer"></div>
 
-    <link rel="stylesheet" href="assets/css/loading.css">
-    <script src="assets/js/loading.js"></script>
+    <script src="assets/js/loading.js" onerror="document.documentElement.classList.remove('page-loading', 'header-loading')"></script>
     <script src="assets/js/notifications.js"></script>
     <script src="assets/js/session.js"></script>
     <script src="assets/locales/catalog.js"></script>
@@ -72,6 +73,7 @@
     <script src="assets/vendor/supabase.js"></script>
     <script src="assets/js/platform.js"></script>
     <script src="assets/js/cart-state.js"></script>
+    <script src="assets/js/utils.js"></script>
     <script src="assets/js/main.js"></script>
     <script src="assets/js/navigation.js"></script>
     <script>

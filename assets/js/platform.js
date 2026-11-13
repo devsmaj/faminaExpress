@@ -42,7 +42,7 @@
     }
     return data;
   }
-  F.api = async (path, options = {}) => {
+  const apiRequest = async (path, options = {}) => {
     await F.ready;
     const session = F.client
       ? (await F.client.auth.getSession()).data.session
@@ -63,6 +63,10 @@
       if (error.status === 401 && F.user) await F.refreshUser(null);
       throw error;
     }
+  };
+  F.api = (path, options) => {
+    const finished = window.FaminaLoading?.request?.() || (() => {});
+    return apiRequest(path, options).finally(finished);
   };
   F.require = async (role) => {
     await F.ready;
@@ -177,6 +181,7 @@
       F.setupError = error;
     }
   })();
+  F.ready.then(() => window.FaminaLoading?.ready?.());
   F.subscribe = async (table, filter, callback, status) => {
     await F.ready;
     if (!F.client) return () => {};

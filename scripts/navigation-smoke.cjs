@@ -36,7 +36,13 @@ app.get("/api/config", (q, s) =>
     supabaseAnonKey: "TEST_PUBLIC",
   }),
 );
-app.get("/api/menu", (q, s) => s.json([item]));
+let holdMenu = false, menuFailure = false;
+const menuResponses = [];
+app.get("/api/menu", (q, s) => {
+  const send = () => menuFailure ? s.status(503).json({message:"TEST menu unavailable"}) : s.json([item]);
+  if (holdMenu) menuResponses.push(send);
+  else send();
+});
 app.get("/api/restaurants", (q, s) => s.json([]));
 app.get("/api/auth/me", (q, s) => {
   const token = q.headers.authorization?.slice(7);
@@ -177,7 +183,27 @@ const sdk = `window.supabase={createClient:()=>{let listener;const session=()=>{
       );
     }
     const { context: guest, page } = await context();
+    holdMenu = true;
     await page.goto(base + "/menu.html", { waitUntil: "domcontentloaded" });
+    await page.waitForSelector(".page-skeleton");
+    assert.equal(await page.locator("main").getAttribute("aria-busy"), "true");
+    await page.waitForFunction(() => document.documentElement.classList.contains("page-loading"));
+    const menuDeadline = Date.now() + 10000;
+    while (!menuResponses.length && Date.now() < menuDeadline) await new Promise(resolve => setTimeout(resolve, 10));
+    assert(menuResponses.length, "menu request never started");
+    holdMenu = false;
+    menuResponses.splice(0).forEach(send => send());
+    await page.waitForFunction(() => !document.documentElement.classList.contains("page-loading"));
+    assert.equal(await page.locator(".header-skeleton").count(),0);
+    menuFailure = true;
+    await page.reload({waitUntil:"domcontentloaded"});
+    await page.waitForFunction(() => !document.documentElement.classList.contains("page-loading"));
+    assert.match(await page.locator("#menu-items").innerText(), /temporarily unavailable/);
+    assert.equal(await page.locator("main").getAttribute("aria-busy"),null);
+    menuFailure = false;
+    await page.reload({waitUntil:"domcontentloaded"});
+    await page.waitForFunction(() => !document.documentElement.classList.contains("page-loading"));
+    console.log("Skeletons track pending requests and release on success/failure.");
     await ready(page);
     assert.deepEqual(await keys(page), publicKeys);
     assert.equal(await page.locator(".nav").evaluate((n) => n.inert), true);
@@ -570,6 +596,13 @@ const sdk = `window.supabase={createClient:()=>{let listener;const session=()=>{
     );
     await retry.context.close();
     console.log("Cart retry and delayed-response isolation passed.");
+    const failedHeader = await context();
+    await failedHeader.context.route("**/components/header.html", route => route.fulfill({status:503,body:"TEST unavailable"}));
+    await failedHeader.page.goto(base + "/about.html", {waitUntil:"domcontentloaded"});
+    await failedHeader.page.waitForSelector(".header-component-error");
+    await failedHeader.page.waitForFunction(() => !document.documentElement.classList.contains("page-loading"));
+    assert.equal(await failedHeader.page.locator(".header-skeleton").count(),0);
+    await failedHeader.context.close();
     assert.deepEqual(errors, []);
     console.log(
       "Navigation passed: public/customer/staff menus, guest cart/login merge/retry/isolation, sign-out failures, private routes, Track Order chooser, keyboard/RTL and 320–1440px layouts.",

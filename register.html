@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="assets/css/auth.css">
     <link rel="stylesheet" href="assets/css/notifications.css">
     <link rel="stylesheet" href="assets/css/platform.css">
+    <script>document.documentElement.classList.add('page-loading', 'header-loading');</script>
+    <link rel="stylesheet" href="assets/css/loading.css">
 </head>
 <body class="auth-page customer-fullscreen" data-auth-page="register">
     <div id="header"></div>
@@ -63,8 +65,7 @@
 
 
 
-    <link rel="stylesheet" href="assets/css/loading.css">
-    <script src="assets/js/loading.js"></script>
+    <script src="assets/js/loading.js" onerror="document.documentElement.classList.remove('page-loading', 'header-loading')"></script>
     <script src="assets/js/notifications.js"></script>
     <script src="assets/js/session.js"></script>
     <script src="assets/locales/catalog.js"></script>

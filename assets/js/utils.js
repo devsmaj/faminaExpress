@@ -7,13 +7,16 @@ function formatPrice(price) {
 
 // Load HTML component into an element
 function loadComponent(elementId, componentPath) {
-    fetch(componentPath)
-        .then(response => response.text())
+    fetch(componentPath, { signal: AbortSignal.timeout(15000) })
+        .then(response => {
+            if (!response.ok) throw new Error('Component unavailable');
+            return response.text();
+        })
         .then(data => {
             document.getElementById(elementId).innerHTML = data;
             document.dispatchEvent(new CustomEvent('componentloaded'));
         })
-        .catch(error => { console.error('Error loading component:', error); window.FaminaNotifications.show('Could not load this page section. Please refresh and try again.', 'error'); });
+        .catch(error => { console.error('Error loading component:', error); window.FaminaLoading?.componentFailed?.(elementId); window.FaminaNotifications.show('Could not load this page section. Please refresh and try again.', 'error'); });
 }
 
 // Shared five-second notifications; loaded on every page.
