@@ -96,28 +96,50 @@ function updateCartCount() {
 // Update authentication status in header
 function updateAuthStatus() { window.Famina.Navigation?.render(); }
 
-// Logout function
+// Confirm before contacting Supabase. Cancel and Escape leave the session intact.
 let signingOut = false;
 async function logout() {
     if (signingOut) return;
     signingOut = true;
-    const done = window.FaminaLoading.start();
-    const button = document.querySelector('[data-sign-out]');
-    if (button) button.disabled = true;
+    const F = window.Famina, t = value => F.t(value);
+    F.Navigation?.close();
+    const dialog = document.createElement('dialog');
+    dialog.className = 'sign-out-dialog';
+    dialog.setAttribute('aria-labelledby', 'sign-out-title');
+    dialog.setAttribute('aria-describedby', 'sign-out-description');
+    dialog.innerHTML = '<h2 id="sign-out-title"></h2><p id="sign-out-description"></p><div class="sign-out-dialog-actions"><button type="button" class="btn-secondary" data-cancel-sign-out></button><button type="button" class="btn" data-confirm-sign-out></button></div>';
+    dialog.querySelector('h2').textContent = t('Sign out');
+    dialog.querySelector('p').textContent = t('Are you sure you want to sign out?');
+    const no = dialog.querySelector('[data-cancel-sign-out]'), yes = dialog.querySelector('[data-confirm-sign-out]');
+    no.textContent = t('No'); yes.textContent = t('Yes');
+    document.body.append(dialog);
+    let pending = false, done = () => {}, buttonDone = () => {};
     try {
-        await window.Famina.ready;
-        if (window.Famina.client) {
-            const { error } = await window.Famina.client.auth.signOut();
-            if (error) throw error;
-        }
-        await window.Famina.refreshUser(null);
-        window.Famina.Navigation?.close();
+        const confirmed = await new Promise(resolve => {
+            no.onclick = () => resolve(false);
+            yes.onclick = () => resolve(true);
+            dialog.addEventListener('cancel', event => { event.preventDefault(); if (!pending) resolve(false); });
+            dialog.showModal();
+            no.focus();
+        });
+        if (!confirmed) return;
+        pending = true;
+        no.disabled = true;
+        done = window.FaminaLoading.start();
+        buttonDone = window.FaminaLoading.button(yes);
+        await F.ready;
+        if (!F.client) throw Error('Authentication setup is incomplete.');
+        const { error } = await F.client.auth.signOut();
+        if (error) throw error;
+        await F.refreshUser(null);
     } catch (error) {
         window.FaminaNotifications.show('Could not sign out. Please try again.', 'error');
     } finally {
+        buttonDone(); done();
+        dialog.close(); dialog.remove();
         signingOut = false;
-        done();
-        if (button?.isConnected) button.disabled = false;
+        const focus = document.querySelector('[data-sign-out],#auth-links a');
+        (focus?.getClientRects().length ? focus : document.querySelector('.hamburger'))?.focus();
     }
 }
 

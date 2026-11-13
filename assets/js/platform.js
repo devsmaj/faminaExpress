@@ -85,20 +85,14 @@
   F.busy = async (button, action) => {
     if (button?.disabled) return;
     const done = window.FaminaLoading.start();
-    if (button) {
-      button.disabled = true;
-      button.setAttribute("aria-busy", "true");
-    }
+    const buttonDone = window.FaminaLoading.button(button);
     try {
       return await action();
     } catch (error) {
       F.notify(error.message, "error");
     } finally {
       done();
-      if (button) {
-        button.disabled = false;
-        button.removeAttribute("aria-busy");
-      }
+      buttonDone();
     }
   };
   let identityRevision = 0;
@@ -196,6 +190,18 @@
       .subscribe((state) => status?.(state));
     return () => F.client.removeChannel(channel);
   };
+  async function showLoginSuccess() {
+    await F.ready;
+    if (!F.user || /\/(login|register)\.html$/.test(location.pathname)) return;
+    try {
+      const receipt = JSON.parse(sessionStorage.getItem("famina-login-success") || "null");
+      sessionStorage.removeItem("famina-login-success");
+      if (receipt?.userId === F.user.id && Date.now() - receipt.at >= 0 && Date.now() - receipt.at < 60000)
+        F.notify("Login successful.", "success");
+    } catch (_) { /* A blocked storage area must not interrupt authentication. */ }
+  }
+  document.addEventListener("DOMContentLoaded", showLoginSuccess);
+  window.addEventListener("famina-auth-updated", showLoginSuccess);
   window.addEventListener("famina-signed-out", () => {
     F.user = null;
   });

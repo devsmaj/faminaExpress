@@ -707,5 +707,11 @@
   },
   "customer_home": {
     "welcome": "مرحباً بعودتك"
+  },
+  "action_feedback": {
+    "sign_out_confirmation": "هل تريد تسجيل الخروج؟",
+    "yes": "نعم",
+    "no": "لا",
+    "login_success": "تم تسجيل الدخول بنجاح."
   }
 }

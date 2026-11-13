@@ -707,5 +707,11 @@
   },
   "customer_home": {
     "welcome": "Welcome back"
+  },
+  "action_feedback": {
+    "sign_out_confirmation": "Are you sure you want to sign out?",
+    "yes": "Yes",
+    "no": "No",
+    "login_success": "Login successful."
   }
 }

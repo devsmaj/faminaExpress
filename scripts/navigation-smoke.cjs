@@ -105,7 +105,7 @@ app.get("/api/orders", (q, s) => {
 app.get("/api/addresses", (q, s) => s.json([]));
 app.get("/api/notifications", (q, s) => s.json([]));
 app.use(express.static(path.resolve(__dirname, "..")));
-const sdk = `window.supabase={createClient:()=>{let listener;const session=()=>{const role=localStorage.getItem('TEST_ROLE');return role?{access_token:role}:null};window.TEST_AUTH=role=>{if(role)localStorage.setItem('TEST_ROLE',role);else localStorage.removeItem('TEST_ROLE');listener?.(role?'SIGNED_IN':'SIGNED_OUT',session());};return {auth:{getSession:async()=>({data:{session:session()}}),onAuthStateChange:fn=>{listener=fn;return {data:{subscription:{unsubscribe(){}}}}},signInWithOAuth:async()=>{localStorage.setItem('TEST_ROLE','customer');location.href='login.html?code=TEST';return {error:null};},signOut:async()=>{if(window.TEST_SIGN_OUT_FAIL)return {error:Error('TEST sign-out failure')};localStorage.removeItem('TEST_ROLE');listener?.('SIGNED_OUT',null);return {error:null};}},channel:()=>({on(){return this},subscribe(fn){fn?.('SUBSCRIBED');return this}}),removeChannel(){}}}};`;
+const sdk = `window.supabase={createClient:()=>{let listener;const session=()=>{const role=localStorage.getItem('TEST_ROLE');return role?{access_token:role}:null};window.TEST_AUTH=role=>{if(role)localStorage.setItem('TEST_ROLE',role);else localStorage.removeItem('TEST_ROLE');listener?.(role?'SIGNED_IN':'SIGNED_OUT',session());};return {auth:{getSession:async()=>({data:{session:session()}}),onAuthStateChange:fn=>{listener=fn;return {data:{subscription:{unsubscribe(){}}}}},signInWithOAuth:async()=>{if(window.TEST_OAUTH_FAIL)return {error:Error("TEST Google unavailable")};localStorage.setItem('TEST_ROLE','customer');location.href='login.html?code=TEST';return {error:null};},signOut:async()=>{if(window.TEST_SIGN_OUT_WAIT)await new Promise(resolve=>window.TEST_RESOLVE_SIGN_OUT=resolve);if(window.TEST_SIGN_OUT_FAIL)return {error:Error('TEST sign-out failure')};localStorage.removeItem('TEST_ROLE');listener?.('SIGNED_OUT',null);return {error:null};}},channel:()=>({on(){return this},subscribe(fn){fn?.('SUBSCRIBED');return this}}),removeChannel(){}}}};`;
 (async () => {
   const server = app.listen(0, "127.0.0.1");
   await new Promise((r) => server.once("listening", r));
@@ -266,6 +266,12 @@ const sdk = `window.supabase={createClient:()=>{let listener;const session=()=>{
     await page.locator("#auth-links a").click();
     await page.waitForURL("**/login.html");
     await ready(page);
+    await page.evaluate(() => window.TEST_OAUTH_FAIL = true);
+    await page.click("#google-continue");
+    await page.waitForSelector(".toast-error");
+    assert.equal(await page.evaluate(() => sessionStorage.getItem("famina-login-success")), null);
+    assert.equal(await page.locator(".toast-success").count(), 0);
+    await page.evaluate(() => window.TEST_OAUTH_FAIL = false);
     await page.click("#google-continue");
     await page.waitForURL("**/cart.html");
     await ready(page);
@@ -275,7 +281,24 @@ const sdk = `window.supabase={createClient:()=>{let listener;const session=()=>{
     assert.deepEqual(await keys(page), customerKeys);
     assert.equal(customerCart.get("customer"), 5);
     assert.equal(await page.locator("#footer").count(), 0);
-    console.log("Login return and guest-cart import passed.");
+    await page.waitForSelector(".toast-success");
+    assert.match(await page.locator(".toast-success").innerText(), /Login successful/);
+    await page.reload({waitUntil:"domcontentloaded"});
+    await ready(page);
+    assert.equal(await page.locator(".toast-success").count(),0);
+    await page.evaluate(() => {
+      const b = document.createElement("button"); b.id="TEST_LOADING_BUTTON";
+      b.innerHTML='<svg aria-hidden="true"></svg><span>TEST action</span>';
+      document.querySelector("main").append(b);
+      window.TEST_BUSY = Famina.busy(b,()=>new Promise(resolve=>window.TEST_RESOLVE_BUSY=resolve));
+    });
+    assert.equal(await page.locator("#TEST_LOADING_BUTTON").isDisabled(),true);
+    assert.equal(await page.locator("#TEST_LOADING_BUTTON .button-loading-ring").count(),1);
+    assert.equal(await page.locator("#TEST_LOADING_BUTTON svg").count(),1);
+    await page.evaluate(async()=>{TEST_RESOLVE_BUSY();await TEST_BUSY;});
+    assert.equal(await page.locator("#TEST_LOADING_BUTTON").isDisabled(),false);
+    assert.equal(await page.locator("#TEST_LOADING_BUTTON .button-loading-ring").count(),0);
+    console.log("Login return, success alert and inline loading passed.");
     for (const href of [
       "customer-home.html",
       "menu.html",
@@ -375,13 +398,30 @@ const sdk = `window.supabase={createClient:()=>{let listener;const session=()=>{
     }
     await page.evaluate(() => i18n.setLanguage("en"));
     await open(page);
+    await page.click("[data-sign-out]");
+    await page.waitForSelector("dialog[open]");
+    assert.equal(await page.locator("[data-cancel-sign-out]").evaluate(el=>el===document.activeElement),true);
+    await page.click("[data-cancel-sign-out]");
+    assert.equal(await page.evaluate(()=>Famina.user.role),"customer");
+    await open(page);
+    await page.click("[data-sign-out]");
+    await page.keyboard.press("Escape");
+    assert.equal(await page.locator("dialog[open]").count(),0);
+    assert.equal(await page.evaluate(()=>Famina.user.role),"customer");
+    await open(page);
     await page.evaluate(() => (window.TEST_SIGN_OUT_FAIL = true));
     await page.click("[data-sign-out]");
-    await page.waitForTimeout(250);
+    await page.click("[data-confirm-sign-out]");
+    await page.waitForSelector("dialog",{state:"detached"});
     assert.deepEqual(await keys(page), customerKeys);
     assert.equal(await page.evaluate(() => Famina.user.role), "customer");
-    await page.evaluate(() => (window.TEST_SIGN_OUT_FAIL = false));
+    await page.evaluate(() => {window.TEST_SIGN_OUT_FAIL = false;window.TEST_SIGN_OUT_WAIT=true;});
+    await open(page);
     await page.click("[data-sign-out]");
+    await page.click("[data-confirm-sign-out]");
+    await page.waitForSelector("[data-confirm-sign-out][aria-busy=true] .button-loading-ring");
+    assert.equal(await page.locator("[data-cancel-sign-out]").isDisabled(),true);
+    await page.evaluate(()=>TEST_RESOLVE_SIGN_OUT());
     await page.waitForFunction(() => Famina.user === null);
     await page.waitForTimeout(150);
     assert.deepEqual(await keys(page), publicKeys);

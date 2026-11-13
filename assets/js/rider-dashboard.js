@@ -5,7 +5,10 @@
     lastSent = 0,
     posting = false,
     stopped = false;
+  let locationButtonDone = () => {};
   function stop() {
+    locationButtonDone();
+    locationButtonDone = () => {};
     const previous = sharing;
     if (watch !== null) navigator.geolocation.clearWatch(watch);
     watch = null;
@@ -50,6 +53,7 @@
         return;
       }
       stop();
+      locationButtonDone = window.FaminaLoading.button(b);
       sharing = b.dataset.share;
       stopped = false;
       document.getElementById("stop-gps").hidden = false;
@@ -76,6 +80,7 @@
             }
           } finally {
             posting = false;
+            locationButtonDone();
           }
         },
         () => {
