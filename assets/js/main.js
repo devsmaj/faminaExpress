@@ -1,38 +1,13 @@
 // Main JavaScript file for general functionality
 (function () {
+if (window.FaminaMainInitialized) return;
+window.FaminaMainInitialized = true;
 
 document.addEventListener('DOMContentLoaded', function() {
     if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).catch(()=>{});
-    function refreshHeaderUI() {
-        // Header is injected asynchronously; retry a few times until nodes exist.
-        let attempts = 0;
-        const maxAttempts = 20;
-        const timer = setInterval(() => {
-            attempts += 1;
-            const hasAuth = !!document.getElementById('auth-links');
-            const hasCart = !!document.getElementById('cart-count');
-
-            if (hasAuth || hasCart) {
-                updateCartCount();
-                updateAuthStatus();
-            }
-
-            if ((hasAuth && hasCart) || attempts >= maxAttempts) {
-                clearInterval(timer);
-            }
-        }, 100);
-    }
-
-    // Locale catalogs are loaded before page scripts on every page.
+    // Header/auth/cart initialize through their single shared event handlers.
     loadComponent('header', 'components/header.html');
     if (document.getElementById('footer')) loadComponent('footer', 'components/footer.html');
-    refreshHeaderUI();
-
-    // Initialize cart count
-    updateCartCount();
-
-    // Initialize auth status
-    updateAuthStatus();
 
     // Newsletter form submission (delegated for async-loaded footer on all pages)
     document.addEventListener('submit', function(e) {

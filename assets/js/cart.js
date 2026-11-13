@@ -1,5 +1,7 @@
 (function () {
   const F = window.Famina;
+  if (F.cartControllerInitialized) return;
+  F.cartControllerInitialized = true;
   let renderRevision = 0;
   async function getCart() {
     return F.Cart.get();
@@ -70,14 +72,8 @@
     });
   });
   document.addEventListener("DOMContentLoaded", () => {
-    updateCartCount();
     renderCartItems();
   });
-  document.addEventListener("componentloaded", updateCartCount);
   window.addEventListener("famina-cart-change", renderCartItems);
   window.addEventListener("famina-auth-updated", renderCartItems);
-  window.addEventListener("famina-signed-out", () => {
-    renderCartItems();
-    updateCartCount();
-  });
 })();

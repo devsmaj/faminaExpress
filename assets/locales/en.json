@@ -713,5 +713,12 @@
     "yes": "Yes",
     "no": "No",
     "login_success": "Login successful."
+  },
+  "auth_recovery": {
+    "unavailable": "Sign-in verification is temporarily unavailable.",
+    "retry_hint": "Please try again.",
+    "updated": "Session updated. Open this page to continue.",
+    "continue": "Continue",
+    "retry": "Retry"
   }
 }

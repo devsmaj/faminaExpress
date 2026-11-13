@@ -107,6 +107,7 @@
         }
       }
       await load();
+      if (!F.user || !container.isConnected) return;
       document.addEventListener("ordersupdated", load);
       const stop = await F.subscribe(
         "orders",

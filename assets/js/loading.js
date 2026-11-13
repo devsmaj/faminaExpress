@@ -1,4 +1,5 @@
 (function () {
+    if (window.FaminaLoading) return;
     let pending = 0, indicator;
     function start() {
         if (!indicator) {
@@ -79,19 +80,21 @@
         busyChildren.splice(0).forEach(child => child.inert = false);
     }
     function revealHeader() {
-        if (authReady && header?.querySelector('.header')) {
+        if (header?.querySelector('.header')) {
             headerSkeleton.remove();
             document.documentElement.classList.remove('header-loading');
         }
     }
     const staticPage = /\/(about|contact|faq|privacy|terms|404)\.html$/.test(location.pathname);
+    const needsAuth = /\/(customer-home|cart|checkout|orders|profile|delivery-tracking|restaurant-owner-dashboard|rider-dashboard|admin-dashboard|login|register)\.html$/.test(location.pathname);
     function settle() {
         revealHeader();
         // One event-loop turn lets existing page handlers render their results.
         // There is no artificial minimum display time or wait for images/video.
         setTimeout(() => {
-            if (initial && domReady && (staticPage || (authReady && !requests))) {
+            if (initial && domReady && (staticPage || ((!needsAuth || authReady) && !requests))) {
                 initial = false;
+                clearTimeout(deadline);
                 endPage();
             }
         }, 0);
@@ -103,10 +106,25 @@
         return () => { if (!finished) { finished = true; requests--; settle(); } };
     }
     beginPage();
+    // A stalled SDK/browser lock must not leave the site as an endless skeleton.
+    const deadline = setTimeout(() => {
+        if (!initial) return;
+        initial = false;
+        skeleton.replaceChildren();
+        skeleton.classList.add('page-load-error');
+        skeleton.setAttribute('role', 'alert');
+        skeleton.removeAttribute('aria-label');
+        const message = document.createElement('p');
+        const text = 'Service unavailable. Please try again.';
+        message.textContent = window.i18n?.translateText(text) || text;
+        skeleton.append(message);
+        main?.removeAttribute('aria-busy');
+    }, 30000);
     document.addEventListener('DOMContentLoaded', () => { domReady = true; settle(); });
     document.addEventListener('componentloaded', revealHeader);
     window.FaminaLoading = {
         start, button, request,
+        resolveGuard() { initial = false; clearTimeout(deadline); endPage(); },
         ready() { authReady = true; settle(); },
         componentFailed(id) {
             if (id !== 'header' || !header) return;
@@ -139,7 +157,7 @@
             record.target.classList.toggle('image-loading', !record.target.complete);
         } else record.addedNodes.forEach(scan);
     })).observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['src', 'srcset'] });
-    let navigationButtonDone;
+    let navigationButtonDone, navigationTimer;
     document.addEventListener('click', event => {
         const link = event.target.closest('a[href]');
         if (!link || event.defaultPrevented || event.button || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey || link.hasAttribute('download') || (link.target && link.target !== '_self')) return;
@@ -148,8 +166,17 @@
         navigationButtonDone?.();
         if (url.origin === location.origin) beginPage();
         navigationButtonDone = button(link);
+        clearTimeout(navigationTimer);
+        queueMicrotask(() => {
+            if (event.defaultPrevented) { endPage(); navigationButtonDone?.(); clearTimeout(navigationTimer); }
+        });
+        navigationTimer = setTimeout(() => {
+            endPage(); navigationButtonDone?.();
+            window.FaminaNotifications?.show('Service unavailable. Please try again.', 'error');
+        }, 15000);
     });
     window.addEventListener('pageshow', event => {
+        clearTimeout(navigationTimer);
         navigationButtonDone?.(); navigationButtonDone = null;
         if (event.persisted) endPage();
     });

@@ -1,6 +1,8 @@
 (function () {
   const F = window.Famina,
     panel = document.getElementById("firebase-auth");
+  if (!panel || panel.dataset.authInitialized) return;
+  panel.dataset.authInitialized = "true";
   let sentPhone = "",
     resendAt = 0,
     busy = false;

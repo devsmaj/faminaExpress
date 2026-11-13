@@ -161,7 +161,7 @@ const sdk = `window.supabase={createClient:()=>{let listener;const session=()=>{
       await page.waitForFunction(async () => {
         if (!window.Famina?.Navigation || !document.querySelector("[data-navigation-link]")) return false;
         await Famina.ready;
-        return !((location.pathname.endsWith("/index.html") || location.pathname.endsWith("/")) && Famina.user?.role === "customer");
+        return true;
       });
       await page.waitForTimeout(100);
     }

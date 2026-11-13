@@ -713,5 +713,12 @@
     "yes": "Oui",
     "no": "Non",
     "login_success": "Connexion réussie."
+  },
+  "auth_recovery": {
+    "unavailable": "La vérification de connexion est temporairement indisponible.",
+    "retry_hint": "Veuillez réessayer.",
+    "updated": "Session mise à jour. Ouvrez cette page pour continuer.",
+    "continue": "Continuer",
+    "retry": "Réessayer"
   }
 }

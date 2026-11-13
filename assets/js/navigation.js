@@ -1,5 +1,6 @@
 (function () {
   const F = window.Famina;
+  if (F.Navigation) return;
   const media = matchMedia("(max-width: 1279px)");
   const privateRoutes = {
     "customer-home.html": ["customer"],
@@ -188,34 +189,35 @@
   }
   async function protect() {
     await F.ready;
-    if (page() === "index.html" && F.user?.role === "customer") {
-      location.replace("customer-home.html");
-      return false;
-    }
     const required = privateRoutes[page()];
     if (!required) return true;
     const main = document.querySelector("main");
     if (!main) return false;
     if (F.user && required.includes(F.user.role)) {
       const identity = F.user.id + ":" + F.user.role;
-      if (routeContent || (routeIdentity && routeIdentity !== identity)) {
-        main.replaceChildren();
-        location.reload();
-        return false;
+      if (!routeContent && (!routeIdentity || routeIdentity === identity)) {
+        routeIdentity = identity;
+        return true;
       }
-      routeIdentity = identity;
-      return true;
     }
     if (!routeContent) {
       routeContent = document.createDocumentFragment();
       while (main.firstChild) routeContent.append(main.firstChild);
     }
-    const guest = !F.user;
-    const guard = F.user ? F.user.id + ":" + F.user.role : "public";
+    const allowed = F.user && required.includes(F.user.role);
+    const unavailable = !F.user && F.authState === "error";
+    const guest = !F.user && !unavailable;
+    const guard = unavailable ? "error" : allowed ? "continue:"+F.user.id+":"+F.user.role : F.user ? F.user.id+":"+F.user.role : "public";
     if (main.dataset.navigationGuard === guard) return false;
     main.dataset.navigationGuard = guard;
     if (guest) window.FaminaSession.rememberPage();
-    main.innerHTML = `<section class="form-section"><div class="container"><h2>${F.t(guest ? "Please login to continue." : "Access denied.")}</h2><p>${F.t(guest ? "Sign in to access this page." : "This page is reserved for another account role.")}</p><a class="btn" href="${guest ? "login.html" : dashboards[F.user.role] || "index.html"}">${F.t(guest ? "Login / Sign up" : dashboards[F.user.role] ? "Dashboard" : "Home")}</a></div></section>`;
+    const heading = unavailable ? "Sign-in verification is temporarily unavailable." : allowed ? "Session updated. Open this page to continue." : guest ? "Please login to continue." : "Access denied.";
+    const message = unavailable ? "Please try again." : allowed ? "" : guest ? "Sign in to access this page." : "This page is reserved for another account role.";
+    const href = allowed ? location.href : guest ? "login.html" : dashboards[F.user?.role] || "index.html";
+    const label = allowed ? "Continue" : guest ? "Login / Sign up" : dashboards[F.user?.role] ? "Dashboard" : "Home";
+    main.innerHTML = '<section class="form-section"><div class="container"><h2>'+F.t(heading)+'</h2><p>'+F.t(message)+'</p>' +
+      (unavailable ? '<button class="btn" data-retry-auth>'+F.t("Retry")+'</button>' : '<a class="btn" href="'+F.escape(href)+'">'+F.t(label)+'</a>') + '</div></section>';
+    window.FaminaLoading?.resolveGuard?.();
     window.i18n?.updatePageTranslations();
     return false;
   }
@@ -228,6 +230,8 @@
     protect();
   });
   document.addEventListener("click", (event) => {
+    const retry = event.target.closest("[data-retry-auth]");
+    if (retry) { F.busy(retry, async () => { await F.retryAuth(); await protect(); }); return; }
     if (event.target.closest(".hamburger")) {
       toggle(!open);
       return;

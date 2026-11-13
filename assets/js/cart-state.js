@@ -1,6 +1,7 @@
 (function () {
   const F = window.Famina,
     key = "famina_guest_cart_v1";
+  if (F.Cart) return;
   let merging = null,
     badgeRevision = 0;
   const channel =
@@ -180,7 +181,7 @@
     try {
       count =
         F.user?.role === "customer"
-          ? (await F.api("/cart")).reduce((s, i) => s + i.quantity, 0)
+          ? (await F.api("/cart", {background:true})).reduce((s, i) => s + i.quantity, 0)
           : F.user
             ? 0
             : (read()?.items || []).reduce((s, i) => s + i.quantity, 0);

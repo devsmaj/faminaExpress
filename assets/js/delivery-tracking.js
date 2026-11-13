@@ -87,6 +87,7 @@
       }
     }
     await load();
+    if (!F.user || !document.getElementById("refresh-tracking")) return;
     document.getElementById("refresh-tracking").onclick = () =>
       F.busy(document.getElementById("refresh-tracking"), load);
     const state = (value) => {
