@@ -2,6 +2,7 @@
   const F = window.Famina;
   const media = matchMedia("(max-width: 1279px)");
   const privateRoutes = {
+    "customer-home.html": ["customer"],
     "checkout.html": ["customer"],
     "orders.html": ["customer"],
     "profile.html": ["customer"],
@@ -155,7 +156,8 @@
       const list = nav.querySelector(".nav-list");
       list.innerHTML = keys
         .map((key) => {
-          const [url, label, i18n, path] = links[key];
+          const [defaultUrl, label, i18n, path] = links[key];
+          const url = key === "home" && role === "customer" ? "customer-home.html" : defaultUrl;
           return `<li><a href="${url}" data-navigation-link="${key}" ${page() === url ? 'aria-current="page"' : ""}><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="${path}"/></svg><span data-i18n="${i18n}">${label}</span>${key === "cart" ? '<span id="cart-count" aria-live="polite" data-no-translate>0</span>' : ""}</a></li>`;
         })
         .join("");
@@ -171,6 +173,9 @@
       F.Cart?.refreshBadge();
       if (open) nav.querySelector(".close-menu")?.focus();
     }
+    document.querySelectorAll('.header .logo a,.header .mobile-menu-brand').forEach((link) => {
+      link.href = role === "customer" ? "customer-home.html" : "index.html";
+    });
     const name = nav.querySelector(".mobile-language-name");
     if (name)
       name.textContent = {
@@ -183,6 +188,10 @@
   }
   async function protect() {
     await F.ready;
+    if (page() === "index.html" && F.user?.role === "customer") {
+      location.replace("customer-home.html");
+      return false;
+    }
     const required = privateRoutes[page()];
     if (!required) return true;
     const main = document.querySelector("main");

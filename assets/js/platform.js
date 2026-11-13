@@ -121,11 +121,38 @@
       throw error;
     }
     if (revision !== identityRevision) return;
+    F.authError = null;
     F.user = data.user;
     window.FaminaSession.save(session.access_token, data.user, "supabase");
     window.updateAuthStatus?.();
     window.dispatchEvent(new Event("famina-auth-updated"));
   };
+  let retryTimer = null, retryAttempts = 0;
+  async function restoreSession() {
+    if (!F.client) return;
+    try {
+      const { data, error } = await F.client.auth.getSession();
+      if (error) throw error;
+      await F.refreshUser(data.session);
+      F.authError = null;
+      retryAttempts = 0;
+      clearTimeout(retryTimer);
+    } catch (error) {
+      F.authError = error;
+      if (error.status === 401 || error.status === 403) {
+        await F.refreshUser(null);
+      } else if (retryAttempts < 3) {
+        // A network/Render outage is not a sign-out. Keep the SDK session so it
+        // can refresh and verify again; never trust a cached profile as identity.
+        clearTimeout(retryTimer);
+        retryTimer = setTimeout(restoreSession, [5000, 15000, 30000][retryAttempts++]);
+      }
+    }
+  }
+  window.addEventListener("online", () => { retryAttempts = 0; restoreSession(); });
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden && F.authError) { retryAttempts = 0; restoreSession(); }
+  });
   F.ready = (async () => {
     try {
       F.config = await request("/config");
@@ -145,25 +172,12 @@
           },
         },
       );
-      const { data, error } = await F.client.auth.getSession();
-      if (error) throw error;
-      await F.refreshUser(data.session);
+      // Install the listener before contacting the API, so a cold server cannot
+      // prevent future token refreshes or sign-in events from being handled.
       F.client.auth.onAuthStateChange(() => {
-        setTimeout(
-          () =>
-            F.client.auth
-              .getSession()
-              .then(({ data, error }) => {
-                if (error) throw error;
-                return F.refreshUser(data.session);
-              })
-              .catch(async (error) => {
-                await F.refreshUser(null);
-                F.notify(error.message, "error");
-              }),
-          0,
-        );
+        setTimeout(() => restoreSession(), 0);
       });
+      await restoreSession();
     } catch (error) {
       window.FaminaSession.clear();
       F.setupError = error;

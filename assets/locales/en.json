@@ -704,5 +704,8 @@
     "Please fill in all required fields: {0}": "Please fill in all required fields: {0}",
     "{0} - FA-MINNA Express": "{0} - FA-MINNA Express",
     "{0} Menu - FA-MINNA Express": "{0} Menu - FA-MINNA Express"
+  },
+  "customer_home": {
+    "welcome": "Welcome back"
   }
 }

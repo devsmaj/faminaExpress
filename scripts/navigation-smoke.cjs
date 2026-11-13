@@ -152,13 +152,11 @@ const sdk = `window.supabase={createClient:()=>{let listener;const session=()=>{
         "profile",
       ];
     async function ready(page) {
-      await page.waitForFunction(() =>
-        Boolean(
-          window.Famina?.Navigation &&
-          document.querySelector("[data-navigation-link]"),
-        ),
-      );
-      await page.evaluate(() => Famina.ready);
+      await page.waitForFunction(async () => {
+        if (!window.Famina?.Navigation || !document.querySelector("[data-navigation-link]")) return false;
+        await Famina.ready;
+        return !((location.pathname.endsWith("/index.html") || location.pathname.endsWith("/")) && Famina.user?.role === "customer");
+      });
       await page.waitForTimeout(100);
     }
     async function keys(page) {
@@ -209,6 +207,7 @@ const sdk = `window.supabase={createClient:()=>{let listener;const session=()=>{
       await page.locator('.nav-list a[href="' + href + '"]').click();
       await page.waitForURL("**/" + href);
       await ready(page);
+      assert.equal(await page.locator("#footer").count(), ["index.html", "about.html"].includes(href) ? 1 : 0);
       await page.waitForFunction(
         () => document.getElementById("cart-count")?.textContent === "2",
       );
@@ -275,9 +274,10 @@ const sdk = `window.supabase={createClient:()=>{let listener;const session=()=>{
     );
     assert.deepEqual(await keys(page), customerKeys);
     assert.equal(customerCart.get("customer"), 5);
+    assert.equal(await page.locator("#footer").count(), 0);
     console.log("Login return and guest-cart import passed.");
     for (const href of [
-      "index.html",
+      "customer-home.html",
       "menu.html",
       "restaurant.html",
       "cart.html",
@@ -288,6 +288,15 @@ const sdk = `window.supabase={createClient:()=>{let listener;const session=()=>{
       await page.locator('.nav-list a[href="' + href + '"]').click();
       await page.waitForURL("**/" + href);
       await ready(page);
+      if (href === "customer-home.html") {
+        assert.equal(await page.locator("#footer").count(), 1);
+        await page.waitForFunction(() => document.getElementById("customer-home-name")?.textContent === "TEST USER");
+        await page.reload({ waitUntil: "domcontentloaded" });
+        await ready(page);
+        assert.equal(await page.evaluate(() => Famina.user?.role), "customer");
+      } else {
+        assert.equal(await page.locator("#footer").count(), 0);
+      }
       await page.waitForFunction(
         () => document.getElementById("cart-count")?.textContent === "5",
       );
@@ -412,6 +421,7 @@ const sdk = `window.supabase={createClient:()=>{let listener;const session=()=>{
     const visitor = await context();
     for (const href of [
       "orders.html",
+      "customer-home.html",
       "checkout.html",
       "profile.html",
       "delivery-tracking.html",

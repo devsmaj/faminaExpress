@@ -1,7 +1,7 @@
 (function () {
     const base = new URL('.', location.href);
     const cookieName = 'faminna_preferences';
-    const allowed = new Set(['index.html','menu.html','restaurant.html','about.html','cart.html','checkout.html','orders.html','profile.html','contact.html','faq.html','privacy.html','terms.html','delivery-tracking.html','restaurant-owner-dashboard.html','rider-dashboard.html','admin-dashboard.html']);
+    const allowed = new Set(['index.html','customer-home.html','menu.html','restaurant.html','about.html','cart.html','checkout.html','orders.html','profile.html','contact.html','faq.html','privacy.html','terms.html','delivery-tracking.html','restaurant-owner-dashboard.html','rider-dashboard.html','admin-dashboard.html']);
     function read(key) { try { return localStorage.getItem(key); } catch (_) { return null; } }
     function write(key, value) {
         try { localStorage.setItem(key, value); return true; }

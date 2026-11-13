@@ -31,8 +31,10 @@
           restaurant_owner: "restaurant-owner-dashboard.html",
           rider: "rider-dashboard.html",
           admin: "admin-dashboard.html",
-        }[F.user?.role] || "profile.html";
-      location.href = window.FaminaSession.returnUrl(fallback);
+        }[F.user?.role] || "customer-home.html";
+      const destination = window.FaminaSession.returnUrl(fallback);
+      const target = new URL(destination, location.href);
+      location.href = F.user?.role === "customer" && /\/(index\.html)?$/.test(target.pathname) ? "customer-home.html" : destination;
     }
   };
   document.getElementById("google-continue").addEventListener("click", () =>

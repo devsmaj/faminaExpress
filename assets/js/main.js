@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Locale catalogs are loaded before page scripts on every page.
     loadComponent('header', 'components/header.html');
-    loadComponent('footer', 'components/footer.html');
+    if (document.getElementById('footer')) loadComponent('footer', 'components/footer.html');
     refreshHeaderUI();
 
     // Initialize cart count
