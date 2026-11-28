@@ -80,7 +80,7 @@ final class DeviceLockController {
         activity.getBridge().getWebView().setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_AUTO);
     }
     void pause() {
-        if (enabled() && !authenticating) {
+        if (enabled()) {
             backgroundAt = SystemClock.elapsedRealtime();
             showCover();
         }
@@ -119,7 +119,9 @@ final class DeviceLockController {
             }
             @Override public void onAuthenticationError(int code, CharSequence error) {
                 authenticating = false;
+                if (enabled()) locked = AppLockPolicy.requiresUnlock(locked, backgroundAt, SystemClock.elapsedRealtime(), minutes());
                 if (locked) { showCover(); message.setText(error); }
+                else if (activity.hasWindowFocus()) hideCover();
                 if (call != null) call.reject(error.toString());
             }
         });
