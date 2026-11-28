@@ -91,7 +91,7 @@ test('shared loader avoids quick flashes and remains visible until overlapping r
   finishA();finishA();assert.equal(loader.hidden,false);
   finishB();assert.equal(loader.hidden,true);
 });
-test('private app requests never create the oversized global loader',()=>{
+test('private navigation shows the official mark immediately and overlapping requests keep it visible',()=>{
   const timers=new Map();let nextTimer=0;
   class Element {
     constructor(){this.children=[];this.hidden=false;this.classList={contains:name=>name==='fp-app',remove(){}};}
@@ -102,11 +102,14 @@ test('private app requests never create the oversized global loader',()=>{
   const document={body,baseURI:'https://devsmaj.github.io/Famipay/',documentElement:{classList:{remove(){}}},createElement:()=>new Element(),addEventListener(){}};
   const window={setTimeout(fn){const id=++nextTimer;timers.set(id,fn);return id;},clearTimeout(id){timers.delete(id);},addEventListener(){}};
   vm.runInNewContext(loadingSource,{window,document,URL});
-  const finishA=window.FaminaLoading.request(),finishB=window.FaminaLoading.request();
-  assert.equal(timers.size,0);
-  assert.equal(body.children.length,0);
-  finishA();finishB();
-  assert.equal(body.children.length,0);
+  window.FaminaLoading.transition();
+  const loader=body.children[0];
+  assert.equal(loader.hidden,false);
+  assert.match(loader.children[1].children[0].src,/famipay-mark\.svg$/);
+  const finish=window.FaminaLoading.request();
+  for(const [id,fn] of [...timers]){timers.delete(id);fn();}
+  assert.equal(loader.hidden,false);
+  finish();assert.equal(loader.hidden,true);
 });
 
 test('public catalog does not wait for a stalled authentication SDK',async()=>{

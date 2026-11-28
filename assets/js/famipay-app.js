@@ -2350,7 +2350,10 @@
     addBottomNavigation();
     shell.append(side, main, bottom);
     app.replaceChildren(shell);
-    window.addEventListener('hashchange', render);
+    window.addEventListener('hashchange', () => {
+        window.FaminaLoading?.transition?.();
+        render();
+    });
     render();
     loadProfilePhoto();
     hydrateProfile();

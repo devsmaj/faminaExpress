@@ -14,7 +14,7 @@
 
 .fp-global-loader-ring {
     grid-area: 1 / 1;
-    width: 96px;
+    width: 48px;
     aspect-ratio: 1;
     border: 3px solid rgb(8 112 82 / 18%);
     border-top-color: #087052;
@@ -25,20 +25,16 @@
 .fp-global-loader-logo-window {
     grid-area: 1 / 1;
     position: relative;
-    width: 74px;
-    height: 20px;
-    overflow: hidden;
+    width: 26px;
+    height: 26px;
 }
 
 .fp-global-loader-logo-window img {
-    position: absolute;
-    top: 50%;
-    left: -29px;
-    width: 104px;
+    display: block;
+    width: 26px;
     max-width: none;
     height: auto;
-    transform: translateY(-50%);
-    animation: fp-loader-pulse 1.2s ease-in-out infinite;
+    height: 26px;
 }
 
 @keyframes fp-loader-rotate {

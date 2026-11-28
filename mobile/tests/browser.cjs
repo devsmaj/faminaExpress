@@ -76,6 +76,18 @@ const server=http.createServer((request,response)=>{
     assert.equal(await page.locator('.fp-classic-balance-value').textContent(),'Wallet not connected');
     await page.getByRole('button',{name:'Hide balance',exact:true}).click();
     assert.equal(await page.locator('.fp-classic-balance-value').textContent(),'******');
+    // Exercise a real private navigation click, not a manually forced loader.
+    await page.clock.install();
+    await page.locator('.fp-classic-grid .card').filter({hasText:'Send Money'}).click();
+    await page.waitForFunction(()=>location.hash==='#send-money');
+    await page.locator('.fp-global-loader').waitFor({state:'visible'});
+    assert.equal(await page.locator('.fp-global-loader-ring').evaluate(node=>getComputedStyle(node).width),'48px');
+    await page.clock.runFor(500);
+    await page.locator('.fp-global-loader').waitFor({state:'hidden'});
+    await page.evaluate(()=>{location.hash='home';});
+    await page.locator('.fp-classic-dashboard').waitFor();
+    await page.clock.runFor(500);
+    await page.clock.resume();
     for(const [label,hash] of [['Send Money','send-money'],['Receive Money','receive-money'],['Mobile Money','mobile-money'],['Airtime','airtime'],['Pay Bills','pay-bills'],['QR Payment','qr-payment'],['Restaurants','restaurants'],['Online Shop','online-shop'],['Agriculture','agriculture']]){
      await page.locator('.fp-classic-grid .card').filter({hasText:label}).click();
      await page.waitForFunction(hash=>location.hash==='#'+hash,hash);

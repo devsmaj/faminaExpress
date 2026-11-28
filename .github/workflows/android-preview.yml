@@ -88,6 +88,9 @@ jobs:
           test "$NEW_CODE" -gt "$OLD_CODE"
           python3 ../scripts/check-apk-icons.py "$RUNNER_TEMP/FAMIPAY-preview.apk" ../dist/FAMIPAY.apk > ../dist/original-icon-verification.txt
           cd ../dist && sha256sum FAMIPAY.apk > SHA256SUMS.txt
+      - name: Enable emulator hardware acceleration when available
+        run: |
+          if [ -e /dev/kvm ]; then sudo chmod a+rw /dev/kvm; fi
       - name: Install existing APK and confirm the update on Android
         uses: reactivecircus/android-emulator-runner@v2
         env:
@@ -117,10 +120,7 @@ jobs:
             adb logcat -d -b crash > mobile/dist/android-crash-log.txt
             # The emulator may report unrelated system-process crashes.
             # Fail only when the installed FAMIPAY package is implicated.
-            if grep -E -A 12 'FATAL EXCEPTION:|Fatal signal [0-9]+' mobile/dist/android-crash-log.txt | grep -E -q 'Process: com\\.famipay\\.app\\.preview|>>> com\\.famipay\\.app\\.preview <<<|Cmdline: com\\.famipay\\.app\\.preview'; then
-              echo "::error::FAMIPAY crashed after launch; inspect android-crash-log.txt"
-              exit 1
-            fi
+            if grep -E -q 'Process: com\.famipay\.app\.preview([, :]|$)|>>> com\.famipay\.app\.preview <<<|Cmdline: com\.famipay\.app\.preview$' mobile/dist/android-crash-log.txt; then echo "::error::FAMIPAY crashed after launch; inspect android-crash-log.txt"; exit 1; fi
       - uses: actions/upload-artifact@v7.0.2
         with:
           name: FAMIPAY.apk

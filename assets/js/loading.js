@@ -8,9 +8,8 @@
     document.body?.classList.contains('fp-verification-page') ||
     document.body?.dataset.authPage
   );
-  // The private app has its own compact account-verification spinner.
-  // Never show the large global overlay on its pages.
-  const allowGlobalOverlay = !document.body?.classList.contains('fp-app') && !document.body?.dataset.authPage;
+  // Private pages use the compact transparent loader; auth retains its own feedback.
+  const allowGlobalOverlay = !document.body?.dataset.authPage;
   let active = 0;
   let showTimer = 0;
   let loader = null;
@@ -28,7 +27,7 @@
     const logoWindow = document.createElement('span');
     logoWindow.className = 'fp-global-loader-logo-window';
     const logo = document.createElement('img');
-    logo.src = new URL('assets/branding/famipay-logo.svg', document.baseURI).href;
+    logo.src = new URL('assets/branding/famipay-mark.svg', document.baseURI).href;
     logo.alt = '';
     logoWindow.append(logo);
     loader.append(ring, logoWindow);
@@ -62,6 +61,12 @@
     };
   }
   function request() { return start(); }
+  function transition() {
+    const done = start();
+    show();
+    // Allow the newly rendered page to paint beneath the same brief native-style ring.
+    window.setTimeout(done, 320);
+  }
   function button(element) {
     if (!element) return () => {};
     if (buttons.has(element)) return buttons.get(element);
@@ -92,7 +97,7 @@
   }
   function reveal() { document.documentElement.classList.remove('page-loading', 'header-loading'); }
   window.FaminaLoading = {
-    start, button, request,
+    start, button, request, transition,
     resolveGuard: reveal,
     ready: reveal,
     componentFailed(id) {
