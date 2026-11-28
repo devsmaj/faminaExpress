@@ -92,7 +92,7 @@ function createApp({
       ? next()
       : next(new ApiError(403, "Access denied."));
   app.get("/", (req, res) =>
-    res.json({ service: "FA-MINNA Express API", health: "/health" }),
+    res.json({ service: "FAMIPAY API", health: "/health" }),
   );
   app.get("/health", (req, res) =>
     res.json({
@@ -261,6 +261,29 @@ function createApp({
       res.json(result);
     }),
   );
+  // Payment PIN changes use the existing hash format and an atomic server-only RPC.
+  app.post("/api/security/payment-pin/change", run(async (req, res) => {
+    const { current_pin, new_pin } = req.body;
+    if (![current_pin, new_pin].every(v => typeof v === "string" && /^\d{6}$/.test(v)))
+      throw new ApiError(400, "Both PINs must contain six digits.");
+    if (current_pin === new_pin) throw new ApiError(400, "Choose a different PIN.");
+    if (typeof env.FAMINA_PIN_PEPPER !== "string" || Buffer.byteLength(env.FAMINA_PIN_PEPPER) < 32)
+      throw new ApiError(503, "Payment security is not configured.");
+    const rpc = (name, args) => db.rpc(name, args, null, true);
+    const record = await rpc("famipay_pin_attempt", { p_user: req.user.id });
+    if (!record || record.allowed !== true) throw new ApiError(429, "PIN verification unavailable. Try again later.");
+    const derive = (pin, salt) => scrypt(crypto.createHmac("sha256", env.FAMINA_PIN_PEPPER).update(pin).digest(), salt, 64, { N: 32768, r: 8, p: 1, maxmem: 64 * 1024 * 1024 });
+    if (!/^[a-f0-9]{128}$/.test(record.pin_hash || "") || !/^[a-f0-9]{32}$/.test(record.pin_salt || ""))
+      throw new ApiError(409, "Payment PIN is unavailable.");
+    const old = await derive(current_pin, Buffer.from(record.pin_salt, "hex"));
+    if (!crypto.timingSafeEqual(old, Buffer.from(record.pin_hash, "hex")))
+      throw new ApiError(403, "Incorrect payment PIN.");
+    const salt = crypto.randomBytes(16);
+    const hash = await derive(new_pin, salt);
+    const result = await rpc("famipay_pin_replace", { p_user: req.user.id, p_expected_hash: record.pin_hash, p_hash: hash.toString("hex"), p_salt: salt.toString("hex") });
+    if (result?.changed !== true) throw new ApiError(409, "PIN changed concurrently. Please retry.");
+    res.json({ ok: true, changed: true });
+  }));
   app.delete(
     "/api/addresses/:id",
     run(async (req, res) => {
