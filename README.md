@@ -42,3 +42,24 @@ Browser fixture tests do not verify hosted Google/SMS login or Supabase WebSocke
 - `assets/vendor/`: pinned Supabase, Leaflet and Chart.js browser bundles with licenses.
 
 Business data comes only from approved records. The former browser demo API, fake tracking and in-memory financial routes have been removed. The historical Firebase setup is superseded by the Supabase setup guide; existing users must reauthenticate during a reviewed migration.
+
+
+## Centralized payment integration (planned)
+
+All services use one authenticated payment engine: quote → initiate → authorize → reserve funds atomically → execute → reconcile → receipt. Internal wallet transfers settle in the ledger; external payments use approved provider adapters. Pending or uncertain provider results must be reconciled before releasing reserved funds.
+
+| Proposed endpoint | Purpose |
+| --- | --- |
+| POST /api/payments/quote | Server-calculated fees and expiring quote |
+| POST /api/payments/initiate | Idempotent transaction creation |
+| POST /api/payments/authorize | Six-digit PIN or transaction-bound WebAuthn proof |
+| POST /api/payments/execute | Authorized execution |
+| GET /api/payments/:id | Owner-scoped transaction status |
+| POST /api/webhooks/:provider | Signed provider confirmation |
+| GET /api/transactions | Owner-scoped history |
+
+Target integrations: FAMIPAY wallet, mobile money, bank transfers, cards, QR, bills, airtime/data and merchant payments.
+
+Security requirements: preserve existing PIN hashes and pepper; rate-limit verification; require fresh identity proof for recovery; store only biometric public-key credentials, never fingerprints; bind authorization to amount, currency and recipient; enforce single-use authorization, idempotency, atomic double-entry accounting, signed webhooks and reconciliation. Never expose service-role credentials to the browser.
+
+Release gates: verify the Render-linked backend source, inspect the live Supabase schema, implement and test migrations in development, test concurrent spending and replay prevention, verify provider sandbox settlement and refunds, and obtain production approval. Real-money activation remains disabled until these gates pass. The endpoints above are proposed contracts, not a claim of deployed functionality.
