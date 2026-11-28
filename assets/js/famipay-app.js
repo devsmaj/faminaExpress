@@ -988,7 +988,40 @@
         'Access to Clipboard':[['Privacy','Clipboard Access']],
         'Close Account':[['Account','Request Account Closure']]
     };
+    function paymentBiometricSwitch(container){
+        const page=container.closest('.fp-settings-page') || container._securityPage || container;
+        const row=element('div',null,'fp-settings-row fp-bio-row');
+        const toggle=element('button',null,'fp-bio-switch');
+        toggle.type='button';toggle.setAttribute('role','switch');toggle.setAttribute('aria-label',translateText('Pay with Fingerprint'));toggle.setAttribute('aria-checked','false');toggle.disabled=true;
+        toggle.append(element('span',null,'fp-bio-thumb'));
+        row.append(element('span',translateText('Pay with Fingerprint')),toggle);container.append(row);
+        const status=element('p',null,'fp-security-status');status.setAttribute('role','alert');status.dataset.kind='error';page.insertBefore(status,page.children[1]||null);
+        const loading=element('p',null,'fp-security-loading');loading.setAttribute('role','status');container.append(loading);
+        let enabled=false;
+        const paint=()=>toggle.setAttribute('aria-checked',String(enabled));
+        const api=(path,body)=>window.Famina.api('/security/biometrics/'+path,body===undefined?{method:'GET'}:{method:'POST',body});
+        const fail=e=>{status.dataset.kind='error';status.textContent=translateText('Unable to update fingerprint security: ')+(e?.message||'Service unavailable');};
+        const decode=v=>Uint8Array.from(atob(v.replace(/-/g,'+').replace(/_/g,'/').padEnd(Math.ceil(v.length/4)*4,'=')),c=>c.charCodeAt(0));
+        const encode=v=>btoa(String.fromCharCode(...new Uint8Array(v))).replace(/\\+/g,'-').replace(/\\//g,'_').replace(/=+$/,'');
+        (async()=>{loading.textContent=translateText('Checking device security…');try{const state=await api('status');if(typeof state?.enabled!=='boolean')throw Error('Invalid security status');enabled=state.enabled;paint();}catch(e){fail(e);}finally{loading.textContent='';toggle.disabled=false;}})();
+        toggle.onclick=async()=>{
+            toggle.disabled=true;status.textContent='';loading.textContent=translateText('Please wait…');
+            try{
+                if(enabled){const result=await api('revoke',{});if(result?.enabled!==false)throw Error('Revocation not confirmed');enabled=false;}
+                else{
+                    if(!window.PublicKeyCredential||!navigator.credentials?.create)throw Error('Device authentication unavailable');
+                    const start=await api('enrollment',{});const options=start?.publicKey;if(!options?.challenge||!options?.user?.id)throw Error('Secure enrollment challenge unavailable');
+                    const publicKey={...options,challenge:decode(options.challenge),user:{...options.user,id:decode(options.user.id)},excludeCredentials:(options.excludeCredentials||[]).map(c=>({...c,id:decode(c.id)})),authenticatorSelection:{...options.authenticatorSelection,authenticatorAttachment:'platform',userVerification:'required'}};
+                    const credential=await navigator.credentials.create({publicKey});if(!credential)throw Error('Device authentication cancelled');
+                    const result=await api('enrollment/confirm',{challenge_id:start.challenge_id,credential:{id:credential.id,rawId:encode(credential.rawId),type:credential.type,response:{clientDataJSON:encode(credential.response.clientDataJSON),attestationObject:encode(credential.response.attestationObject),transports:credential.response.getTransports?.()||[]},clientExtensionResults:credential.getClientExtensionResults()}});
+                    if(result?.enabled!==true)throw Error('Enrollment not confirmed');enabled=true;
+                }
+                paint();status.dataset.kind='success';status.textContent=translateText(enabled?'Device authentication enabled.':'Device authentication disabled.');
+            }catch(e){fail(e);}finally{loading.textContent='';toggle.disabled=false;}
+        };
+    }
     function settingsRow(container,label,target,icon){
+        if(label==='Pay with Fingerprint'){paymentBiometricSwitch(container);return;}
         const button=element('button',null,'fp-settings-row');
         button.type='button';
         if(icon && iconPaths[icon])button.append(svgIcon(icon));
@@ -1074,6 +1107,7 @@
         }
         const button=element('button',translateText(isBio?'Set Up Fingerprint':isReset?'Start Verification':'Change Payment PIN'),'fp-premium-cta fp-security-submit');
         button.type='button';
+        const loading=element('p',null,'fp-security-loading');loading.setAttribute('role','status');
         button.onclick=async()=>{
             status.textContent='';status.dataset.kind='error';
             if(isChange && (!Object.values(fields).every(input=>/^\\d{6}$/.test(input.value)) || fields.next.value!==fields.confirm.value || fields.next.value===fields.current.value)){
@@ -1081,7 +1115,7 @@
             }
             if(isBio && !window.PublicKeyCredential){status.textContent='This device or browser does not support secure biometric credentials.';return;}
             if(!window.Famina?.api){status.textContent='Secure account service is unavailable. No changes were made.';return;}
-            button.disabled=true;status.textContent='Submitting securely…';status.dataset.kind='pending';
+            button.disabled=true;loading.textContent=translateText('Submitting securely…');
             try{
                 // PINs must only be handled by the authenticated server; never save them in browser storage.
                 const endpoint=isBio?'/security/biometrics/enrollment':isReset?'/security/payment-pin/reset/start':'/security/payment-pin/change';
@@ -1091,9 +1125,9 @@
                 if(isChange)Object.values(fields).forEach(input=>input.value='');
             }catch(e){
                 status.dataset.kind='error';status.textContent='Unable to complete securely: '+(e?.message||'service not available')+'. No changes were confirmed.';
-            }finally{button.disabled=false;}
+            }finally{button.disabled=false;loading.textContent='';}
         };
-        panel.append(button);page.append(panel);
+        panel.append(button,loading);page.append(panel);
         return true;
     }
 
@@ -1106,6 +1140,7 @@
             sections.forEach(([heading,...items])=>{
                 page.append(element('h3',translateText(heading),'fp-settings-heading'));
                 const card=element('section',null,'fp-settings-card');
+                card._securityPage=page;
                 items.forEach(item=>{
                     if(['Clipboard Access'].includes(item)){
                         const line=element('div',null,'fp-settings-row');line.append(element('span',translateText(item)));
