@@ -1,0 +1,15 @@
+'use strict';
+const test = require('node:test');
+const assert = require('node:assert/strict');
+const crypto = require('node:crypto');
+const { verifyPaymentPin } = require('./platform/payment-pin');
+const env = { FAMINA_PIN_PEPPER: 'test-only-pepper-not-for-production-123' };
+const salt = Buffer.alloc(16, 7);
+const hash = crypto.scryptSync(crypto.createHmac('sha256', env.FAMINA_PIN_PEPPER).update('123456').digest(), salt, 64, {N:32768,r:8,p:1,maxmem:64*1024*1024}).toString('hex');
+const record = {allowed:true,pin_hash:hash,pin_salt:salt.toString('hex')};
+const args = {env,userId:'test-user',pin:'123456',db:{rpc:async(name,params,token,privileged)=>{assert.equal(name,'famipay_pin_attempt');assert.equal(params.p_user,'test-user');assert.equal(privileged,true);return record;}}};
+test('correct PIN returns version for atomic authorization',async()=>assert.equal(await verifyPaymentPin(args),hash));
+test('incorrect PIN rejected',async()=>assert.rejects(verifyPaymentPin({...args,pin:'654321'}),{status:403}));
+test('invalid PIN rejected',async()=>assert.rejects(verifyPaymentPin({...args,pin:'123'}),{status:400}));
+test('locked PIN rejected',async()=>assert.rejects(verifyPaymentPin({...args,db:{rpc:async()=>({allowed:false})}}),{status:429}));
+test('missing pepper fails closed',async()=>assert.rejects(verifyPaymentPin({...args,env:{}}),{status:503}));
