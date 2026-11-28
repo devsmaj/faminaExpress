@@ -1,0 +1,15 @@
+'use strict';
+const test=require('node:test');
+const assert=require('node:assert/strict');
+const crypto=require('node:crypto');
+const {verifyWebhook}=require('./platform/payment-webhook');
+const secret='test-only-secret-at-least-32-bytes';
+const timestamp='1795900000';
+const rawBody=Buffer.from('{"id":"test"}');
+const signature=crypto.createHmac('sha256',secret).update(timestamp+'.').update(rawBody).digest('hex');
+const args={secret,timestamp,rawBody,signature,now:Number(timestamp)*1000};
+test('valid signature accepted',()=>assert.equal(verifyWebhook(args),true));
+test('tampered body rejected',()=>assert.equal(verifyWebhook({...args,rawBody:Buffer.from('{}')}),false));
+test('expired signature rejected',()=>assert.equal(verifyWebhook({...args,now:args.now+300001}),false));
+test('malformed signature rejected',()=>assert.equal(verifyWebhook({...args,signature:'bad'}),false));
+test('missing secret rejected',()=>assert.equal(verifyWebhook({...args,secret:''}),false));
