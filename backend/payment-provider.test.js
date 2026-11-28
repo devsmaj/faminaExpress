@@ -1,0 +1,11 @@
+'use strict';
+const test = require('node:test');
+const assert = require('node:assert/strict');
+const {createProviderRegistry,validateProviderOutcome} = require('./platform/payment-provider');
+test('providers disabled by default',()=>{const r=createProviderRegistry();assert.equal(r.enabled('wallet'),false);assert.throws(()=>r.get('wallet'),{status:503});});
+test('invalid adapters rejected',()=>assert.throws(()=>createProviderRegistry({wallet:{execute(){}}})));
+test('explicit adapter registered',()=>{const adapter={execute(){},status(){}};assert.equal(createProviderRegistry({wallet:adapter}).get('wallet'),adapter);});
+const expected={transactionId:'test-id',amount:5000,currency:'XAF'};
+const result={...expected,status:'successful',reference:'provider-test'};
+test('valid outcomes accepted',()=>{for(const status of ['successful','pending','failed']) assert.deepEqual(validateProviderOutcome({...result,status},expected),{status,reference:result.reference});});
+test('mismatched or ambiguous outcomes rejected',()=>{for(const patch of [{amount:1},{currency:'USD'},{transactionId:'other'},{reference:''},{status:'unknown'}]) assert.throws(()=>validateProviderOutcome({...result,...patch},expected),{status:502});});
