@@ -59,6 +59,7 @@
         {group:'Account',title:"Change Password",id:'settings-change-password'},
         {group:'Account',title:"Forgot Password",id:'settings-forgot-password'},
         {group:'Account',title:"Auto-logout Setting",id:'settings-auto-logout-setting'},
+        {group:'Account',title:"Log in with Fingerprint",id:'settings-log-in-with-fingerprint'},
         {group:'Account',title:"Set Up Pattern",id:'settings-set-up-pattern'},
         {group:'Account',title:"Trusted Devices",id:'settings-trusted-devices'},
         {group:'Account',title:"Login Activity",id:'settings-login-activity'},
@@ -1078,6 +1079,48 @@
         const status=element('p','','fp-language-status');status.setAttribute('role','status');page.append(status);
         update();
     }
+    function renderDeviceAppLock(page) {
+        page.classList.add('fp-me-details','fp-settings-page','fp-security-flow','fp-app-lock');
+        profileBackHeader(page,'App Lock');
+        const panel=element('section',null,'fp-settings-card fp-security-panel');
+        panel.append(element('h2',translateText('Fingerprint or phone PIN')));
+        panel.append(element('p',translateText('Unlock your saved FAMIPAY session with Android device security. Your phone PIN, pattern or password is separate from your payment PIN.'),'fp-settings-note'));
+        const status=element('p','','fp-security-status');status.setAttribute('role','status');
+        const native=window.FaminaDeviceLock;
+        if(!native){
+            panel.append(element('p',translateText('App Lock is available in the FAMIPAY Android app. On the website, continue using your account password.')));
+            page.append(panel);return;
+        }
+        const label=element('label',translateText('Lock after leaving the app'),'fp-security-field');
+        const select=element('select');select.setAttribute('aria-label','Lock after leaving the app');
+        [[0,'Immediately'],[5,'After 5 minutes'],[30,'After 30 minutes']].forEach(([value,text])=>{
+            const option=element('option',translateText(text));option.value=String(value);select.append(option);
+        });
+        label.append(select);
+        const save=element('button',translateText('Enable app lock'),'fp-settings-primary');save.type='button';save.disabled=true;
+        const disable=element('button',translateText('Turn off app lock'),'fp-settings-row');disable.type='button';disable.hidden=true;
+        const paint=state=>{
+            select.value=String(state.minutes);
+            save.disabled=!state.available;
+            save.textContent=translateText(state.enabled?'Save app lock settings':'Enable app lock');
+            disable.hidden=!state.enabled;
+            status.textContent=translateText(state.enabled?'App lock is on.':'App lock is off.');
+            if(!state.available)status.textContent=translateText('Set a screen-lock PIN or password in Android Settings first.');
+        };
+        const configure=async enabled=>{
+            save.disabled=disable.disabled=true;
+            try{
+                const state=await native.configure({enabled,minutes:Number(select.value)});
+                paint(state);
+            }catch(error){status.textContent=error.message||translateText('Device authentication was not completed. No settings changed.');}
+            finally{save.disabled=disable.disabled=false;}
+        };
+        save.onclick=()=>configure(true);disable.onclick=()=>configure(false);
+        panel.append(label,save,disable,status,element('p',translateText('Reopening a closed app always requires unlocking. After sign-out or an expired session, sign in with your account again.'),'fp-settings-note'));
+        page.append(panel);
+        native.status().then(paint).catch(error=>{status.textContent=error.message||'Unable to read device security.';});
+    }
+
     function renderPaymentSecurityForm(page, title) {
         const isChange = title === 'Change Payment PIN';
         const isReset = title === 'Forgot Payment PIN';
@@ -1133,6 +1176,7 @@
 
     function renderSettingsDetail(page,title){
         page.classList.add('fp-me-details','fp-settings-page');
+        if(title==='Log in with Fingerprint'||title==='Auto-logout Setting'){renderDeviceAppLock(page);return;}
         if(renderPaymentSecurityForm(page,title)) return;
         profileBackHeader(page,title);
         const sections=settingsSections[title];
@@ -1278,12 +1322,6 @@
                 finally{send.disabled=false;send.setAttribute('aria-busy','false');}
             };
             card.append(status,send);page.append(card);return;
-        }
-        if(title==='Auto-logout Setting'){
-            const card=element('section',null,'fp-settings-card fp-settings-question');
-            card.append(element('p',translateText('Choose an inactivity timeout')));
-            ['5 minutes','15 minutes','30 minutes'].forEach(label=>{const row=element('label',null,'fp-settings-row');const input=document.createElement('input');input.type='radio';input.name='fp-timeout';row.append(input,element('span',label));card.append(row);});
-            page.append(card);return;
         }
         if(title==='Terms & Conditions'||title==='Privacy Policy'){
             const link=element('a',translateText('Open '+title),'fp-settings-document');

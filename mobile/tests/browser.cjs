@@ -30,6 +30,7 @@ const server=http.createServer((request,response)=>{
  try{
   browser=await chromium.launch({channel:process.env.BROWSER_CHANNEL||'chrome',headless:true});
   const page=await browser.newPage({viewport:{width:390,height:844}});
+  await page.addInitScript(()=>localStorage.setItem('language','en'));
   const errors=[];
   page.on('pageerror',error=>errors.push(error.message));
   const origin='http://127.0.0.1:'+server.address().port;
@@ -77,23 +78,55 @@ const server=http.createServer((request,response)=>{
     await page.getByRole('button',{name:'Hide balance',exact:true}).click();
     assert.equal(await page.locator('.fp-classic-balance-value').textContent(),'******');
     // Exercise a real private navigation click, not a manually forced loader.
-    await page.clock.install();
+    await page.evaluate(()=>{
+     window.navigationLoaderWidths=[];
+     window.navigationLoaderObserver=new MutationObserver(()=>{
+      const ring=document.querySelector('.fp-global-loader:not([hidden]) .fp-global-loader-ring');
+      if(ring)window.navigationLoaderWidths.push(getComputedStyle(ring).width);
+     });
+     window.navigationLoaderObserver.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['hidden']});
+    });
     await page.locator('.fp-classic-grid .card').filter({hasText:'Send Money'}).click();
     await page.waitForFunction(()=>location.hash==='#send-money');
-    await page.locator('.fp-global-loader').waitFor({state:'visible'});
-    assert.equal(await page.locator('.fp-global-loader-ring').evaluate(node=>getComputedStyle(node).width),'48px');
-    await page.clock.runFor(500);
+    await page.waitForFunction(()=>window.navigationLoaderWidths.includes('48px'));
     await page.locator('.fp-global-loader').waitFor({state:'hidden'});
+    await page.evaluate(()=>window.navigationLoaderObserver.disconnect());
     await page.evaluate(()=>{location.hash='home';});
     await page.locator('.fp-classic-dashboard').waitFor();
-    await page.clock.runFor(500);
-    await page.clock.resume();
     for(const [label,hash] of [['Send Money','send-money'],['Receive Money','receive-money'],['Mobile Money','mobile-money'],['Airtime','airtime'],['Pay Bills','pay-bills'],['QR Payment','qr-payment'],['Restaurants','restaurants'],['Online Shop','online-shop'],['Agriculture','agriculture']]){
      await page.locator('.fp-classic-grid .card').filter({hasText:label}).click();
      await page.waitForFunction(hash=>location.hash==='#'+hash,hash);
      await page.evaluate(()=>{location.hash='home';});
      await page.locator('.fp-classic-dashboard').waitFor();
     }
+   }
+   if(role==='customer'){
+    await page.evaluate(()=>{location.hash='settings-log-in-with-fingerprint';});
+    await page.getByText('App Lock is available in the FAMIPAY Android app.',{exact:false}).waitFor();
+    assert.equal(await page.getByRole('button',{name:'Enable app lock',exact:true}).count(),0);
+    await page.evaluate(()=>{
+     window.deviceLockCalls=[];
+     window.FaminaDeviceLock={status:async()=>({enabled:false,minutes:0,available:true}),configure:async options=>{
+      window.deviceLockCalls.push(options);
+      if(window.deviceLockCalls.length===1)throw Error('Device authentication cancelled');
+      return {enabled:options.enabled,minutes:options.minutes,available:true};
+     }};
+     location.hash='settings-auto-logout-setting';
+    });
+    const delay=page.getByRole('combobox',{name:'Lock after leaving the app'});
+    await delay.waitFor();assert.equal(await delay.locator('option').count(),3);
+    await delay.selectOption('5');
+    await page.getByRole('button',{name:'Enable app lock',exact:true}).click();
+    await page.getByText('Device authentication cancelled',{exact:true}).waitFor();
+    assert(await page.getByRole('button',{name:'Turn off app lock',exact:true}).isHidden());
+    await page.getByRole('button',{name:'Enable app lock',exact:true}).click();
+    await page.getByText('App lock is on.',{exact:true}).waitFor();
+    await delay.selectOption('30');await page.getByRole('button',{name:'Save app lock settings',exact:true}).click();
+    await page.getByRole('button',{name:'Turn off app lock',exact:true}).click();
+    await page.getByText('App lock is off.',{exact:true}).waitFor();
+    assert.deepEqual(await page.evaluate(()=>window.deviceLockCalls),[{enabled:true,minutes:5},{enabled:true,minutes:5},{enabled:true,minutes:30},{enabled:false,minutes:30}]);
+    await page.evaluate(()=>{delete window.FaminaDeviceLock;location.hash='home';});
+    await page.locator('.fp-classic-dashboard').waitFor();
    }
    assert(await page.locator('#app main').count(),`missing private content for ${role}`);
    const layout=await page.evaluate(()=>({width:innerWidth,scroll:document.documentElement.scrollWidth,overflow:[...document.querySelectorAll('body *')].filter(node=>node.getBoundingClientRect().right>innerWidth+1).slice(0,6).map(node=>({tag:node.tagName,cls:node.className,width:node.getBoundingClientRect().width}))}));

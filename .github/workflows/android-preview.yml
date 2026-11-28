@@ -79,7 +79,7 @@ jobs:
         working-directory: mobile/android
         run: |
           chmod +x gradlew
-          ./gradlew --no-daemon assembleDebug
+          ./gradlew --no-daemon testDebugUnitTest assembleDebug
           mkdir -p ../dist
           cp app/build/outputs/apk/debug/app-debug.apk ../dist/FAMIPAY.apk
           "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose ../dist/FAMIPAY.apk
@@ -128,6 +128,7 @@ jobs:
             # The emulator may report unrelated system-process crashes.
             # Fail only when the installed FAMIPAY package is implicated.
             if grep -E -q 'Process: com\.famipay\.app\.preview([, :]|$)|>>> com\.famipay\.app\.preview <<<|Cmdline: com\.famipay\.app\.preview$' mobile/dist/android-crash-log.txt; then echo "::error::FAMIPAY crashed after launch; inspect android-crash-log.txt"; exit 1; fi
+            cd mobile/android && ./gradlew --no-daemon connectedDebugAndroidTest
       - uses: actions/upload-artifact@v7.0.2
         with:
           name: FAMIPAY-build-backup
@@ -168,4 +169,6 @@ jobs:
             mobile/dist/original-apk-info.txt
             mobile/dist/apk-info.txt
             mobile/dist/original-icon-verification.txt
+            mobile/android/app/build/reports/androidTests/
+            mobile/android/app/build/reports/tests/
           if-no-files-found: ignore

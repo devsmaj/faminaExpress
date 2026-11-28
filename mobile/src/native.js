@@ -1,9 +1,12 @@
 import {App} from '@capacitor/app';
 import {Browser} from '@capacitor/browser';
-import {Capacitor} from '@capacitor/core';
+import {Capacitor, registerPlugin} from '@capacitor/core';
 import {SplashScreen} from '@capacitor/splash-screen';
 
-if (Capacitor.isNativePlatform()) window.FaminaNativeApp = App;
+if (Capacitor.isNativePlatform()) {
+    window.FaminaNativeApp = App;
+    window.FaminaDeviceLock = registerPlugin('FamipayDeviceLock');
+}
 
 async function handleAuthCallback(value) {
     let callback;
