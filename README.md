@@ -1,10 +1,17 @@
-# FA-MINNA Express
+# FAMIPAY
 
-Food delivery platform for Abéché, Chad. Static HTML/CSS/JavaScript frontend, Node.js API, Supabase Auth/PostgreSQL/RLS, and Supabase Realtime. Existing orange branding, multipage layout, mobile navigation, authentication video and English/French/Arabic interfaces are retained.
+FAMIPAY is a digital payments and everyday services platform for Chad, evolving from the former FA-MINNA Express food delivery application. It brings wallet and transfer interfaces, mobile money, airtime, bill payments, QR payments, shopping and delivery services into a unified mobile-first experience.
+
+The platform uses a static HTML/CSS/JavaScript frontend, Node.js API, Supabase Auth/PostgreSQL/RLS and Supabase Realtime, with English, French and Arabic interfaces.
+
+- [FAMIPAY web application](https://devsmaj.github.io/Famipay/)
+- [Existing Render backend](https://faminaexpress.onrender.com)
+
+The legacy backend service name is retained for compatibility. Payment interfaces do not imply that external providers or security endpoints are production-ready.
 
 ## Development status
 
-Work is isolated on `production/abeche-platform`. No production deployment or push to `main` has been performed. The new database has no restaurant, menu, price, tariff, payment or GPS seed data. Configure a development Supabase project before using real accounts or orders. Airtel Money and Moov Money are disabled until approved integrations pass security tests.
+FAMIPAY frontend development continues on `main`. The historical `production/abeche-platform` plan documents the earlier delivery platform. Use a separate development Supabase project and test accounts for validation. Payment PIN changes, recovery, biometric authorization and external payment integrations require verified backend support and end-to-end testing before real-money use. Airtel Money and Moov Money must remain disabled until approved integrations pass security tests.
 
 - [Repository audit and phased plan](docs/PRODUCTION_PLAN.md)
 - [Create and configure the development Supabase project](docs/SUPABASE_SETUP.md)
@@ -14,7 +21,7 @@ Work is isolated on `production/abeche-platform`. No production deployment or pu
 
 Use Node >=22.9. Install dependencies with `npm --prefix backend ci`. Copy `backend/.env.example` to `backend/.env` and fill the development settings; never commit secrets. Apply the initial SQL migration to a new Supabase development project as described in the setup guide.
 
-Run `npm start` for the API (port 3001 by default). Serve the static frontend on port 3000 using a local static server. `assets/js/config.js` uses localhost for local development; the existing deployed API address remains in that file for a future reviewed release.
+Run `npm start` for the API (port 3001 by default). Serve the static frontend on port 3000 using a local static server. `assets/js/config.js` uses localhost for local development; review the configured deployed API address before release.
 
 ## Validation
 
