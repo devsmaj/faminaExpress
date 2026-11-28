@@ -128,7 +128,7 @@ jobs:
             # The emulator may report unrelated system-process crashes.
             # Fail only when the installed FAMIPAY package is implicated.
             if grep -E -q 'Process: com\.famipay\.app\.preview([, :]|$)|>>> com\.famipay\.app\.preview <<<|Cmdline: com\.famipay\.app\.preview$' mobile/dist/android-crash-log.txt; then echo "::error::FAMIPAY crashed after launch; inspect android-crash-log.txt"; exit 1; fi
-            cd mobile/android && ./gradlew --no-daemon connectedDebugAndroidTest
+            cd mobile/android && ./gradlew --no-daemon :app:connectedDebugAndroidTest
       - uses: actions/upload-artifact@v7.0.2
         with:
           name: FAMIPAY-build-backup
