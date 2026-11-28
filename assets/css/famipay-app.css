@@ -1744,3 +1744,17 @@ body.fp-app .fp-security-flow .fp-security-status:empty{display:none!important;}
 body.fp-app .fp-security-flow .fp-security-status{position:sticky;top:0;z-index:5;margin:0!important;padding:10px 12px!important;border-radius:9px;background:#fff0ef;color:#a52323!important;font-size:13px!important;line-height:1.4;}
 body.fp-app .fp-security-flow .fp-security-status[data-kind="success"]{background:#e7f7ef;color:#006b4e!important;}
 body.fp-app .fp-security-flow .fp-security-status[data-kind="pending"]{background:#edf4f8;color:#284e68!important;}
+
+/* Payment settings switch and consistent feedback placement. */
+body.fp-app .fp-settings-page .fp-bio-row{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+body.fp-app .fp-settings-page .fp-bio-switch{position:relative;flex:none;width:48px;height:28px;border:0!important;border-radius:999px!important;background:#cbd3d0!important;padding:0!important;box-shadow:none!important;cursor:pointer;}
+body.fp-app .fp-settings-page .fp-bio-switch[aria-checked="true"]{background:#00865f!important;}
+body.fp-app .fp-bio-thumb{position:absolute;top:3px;inset-inline-start:3px;width:22px;height:22px;background:#fff;border-radius:50%;transition:inset-inline-start .18s;}
+body.fp-app .fp-bio-switch[aria-checked="true"] .fp-bio-thumb{inset-inline-start:23px;}
+body.fp-app .fp-bio-switch:disabled{opacity:.65;cursor:wait;}
+body.fp-app .fp-settings-page .fp-security-status:empty,body.fp-app .fp-security-loading:empty{display:none!important;}
+body.fp-app .fp-settings-page .fp-security-status{position:sticky;top:0;z-index:5;padding:10px 12px!important;margin:8px 0!important;border-radius:9px;background:#fff0ef;color:#a52323!important;font-size:13px!important;}
+body.fp-app .fp-settings-page .fp-security-status[data-kind="success"]{background:#e7f7ef;color:#006b4e!important;}
+body.fp-app .fp-security-loading{display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;color:#087b59;margin:8px 0!important;}
+body.fp-app .fp-security-loading:not(:empty)::before{content:"";width:14px;height:14px;border:2px solid #cde8df;border-top-color:#00865f;border-radius:50%;animation:fp-security-spin .8s linear infinite;}
+@keyframes fp-security-spin{to{transform:rotate(360deg);}}
