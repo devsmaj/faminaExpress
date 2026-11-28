@@ -1728,3 +1728,19 @@ body.fp-app .fp-all-services button:focus-visible {outline:2px solid #008b60;out
 .fp-security-flow .fp-security-submit{width:100%;min-height:52px;border-radius:14px}
 .fp-security-flow .fp-security-submit:disabled{opacity:.55}
 .fp-security-flow .fp-security-status{margin:0;color:#386557;line-height:1.5;font-size:14px}
+
+/* Compact payment security form and accessible feedback. */
+body.fp-app .app .main .fp-security-flow .fp-security-panel{display:flex;flex-direction:column;gap:12px!important;padding:16px!important;margin:8px 0!important;box-shadow:none!important;border:0!important;}
+body.fp-app .fp-security-flow .fp-security-symbol{width:48px!important;height:48px!important;display:grid;place-items:center;margin:0!important;}
+body.fp-app .fp-security-symbol svg,.fp-security-eye svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;color:#087b59;}
+body.fp-app .fp-security-flow .fp-security-panel h2{font-size:21px!important;margin:0!important;line-height:1.25;}
+body.fp-app .fp-security-flow .fp-settings-note{margin:0 0 4px!important;font-size:14px!important;line-height:1.45;}
+body.fp-app .fp-security-flow .fp-security-field{display:flex;flex-direction:column;gap:6px!important;margin:0!important;font-size:14px!important;}
+body.fp-app .fp-security-input-wrap{position:relative;width:100%;}
+body.fp-app .fp-security-input-wrap input{width:100%!important;box-sizing:border-box;min-height:48px!important;padding:10px 48px 10px 12px!important;margin:0!important;}
+body.fp-app .fp-security-eye{position:absolute;inset-inline-end:4px;top:50%;transform:translateY(-50%);width:40px;height:40px;display:grid;place-items:center;border:0!important;background:transparent!important;padding:0!important;box-shadow:none!important;}
+body.fp-app .fp-security-flow .fp-security-submit{margin:6px 0 0!important;min-height:48px!important;cursor:pointer;}
+body.fp-app .fp-security-flow .fp-security-status:empty{display:none!important;}
+body.fp-app .fp-security-flow .fp-security-status{position:sticky;top:0;z-index:5;margin:0!important;padding:10px 12px!important;border-radius:9px;background:#fff0ef;color:#a52323!important;font-size:13px!important;line-height:1.4;}
+body.fp-app .fp-security-flow .fp-security-status[data-kind="success"]{background:#e7f7ef;color:#006b4e!important;}
+body.fp-app .fp-security-flow .fp-security-status[data-kind="pending"]{background:#edf4f8;color:#284e68!important;}
