@@ -1,7 +1,14 @@
 name: FAMIPAY Android APK
 
-# APK builds are paused on commits; start manually from GitHub Actions when needed.
 on:
+  push:
+    branches: [main]
+    paths:
+      - mobile/**
+      - assets/**
+      - components/**
+      - '*.html'
+      - .github/workflows/android-preview.yml
   workflow_dispatch:
 
 permissions:
@@ -123,7 +130,7 @@ jobs:
             if grep -E -q 'Process: com\.famipay\.app\.preview([, :]|$)|>>> com\.famipay\.app\.preview <<<|Cmdline: com\.famipay\.app\.preview$' mobile/dist/android-crash-log.txt; then echo "::error::FAMIPAY crashed after launch; inspect android-crash-log.txt"; exit 1; fi
       - uses: actions/upload-artifact@v7.0.2
         with:
-          name: FAMIPAY.apk
+          name: FAMIPAY-build-backup
           path: mobile/dist/FAMIPAY.apk
           retention-days: 30
       - name: Publish the update APK

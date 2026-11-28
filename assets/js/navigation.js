@@ -102,7 +102,7 @@
       ["♢", "Privacy policy", "How information is handled", "privacy.html"],
       ["⚖", "Terms & conditions", "Conditions of use", "terms.html"],
     ]],
-    download: ["Download", [["↓", "FAMIPAY app", "App coming soon", null]]],
+    download: ["Download", [["↓", "FAMIPAY app", "Download for Android", "https://github.com/devsmaj/Famipay/releases/download/famipay-preview/FAMIPAY.apk"]]],
   };
   const menuIcons = {
     "Send money": '<path d="M22 2 15 22l-4-9-9-4 20-7ZM22 2 11 13"/>',
@@ -126,7 +126,9 @@
     "FAMIPAY app": '<rect x="5" y="2" width="14" height="20" rx="2"/><path d="M10 18h4m2-10-4 4-4-4m4 4V5"/>',
   };
   function homeNavigation() {
-    return Object.entries(homeMenus).map(([id, [title, items]]) =>
+    return Object.entries(homeMenus).map(([id, [title, items]]) => id === 'download'
+      ? `<li class="home-menu-item"><a class="home-menu-toggle" data-navigation-link="download" href="${items[0][3]}" download="FAMIPAY.apk" aria-label="Download FAMIPAY APK for Android">${title}</a></li>`
+      :
       `<li class="home-menu-item"><button type="button" class="home-menu-toggle" data-navigation-link="${id}" data-home-menu="${id}" aria-expanded="false" aria-controls="home-menu-${id}"><span>${title}</span>${id === 'download' ? '' : '<span aria-hidden="true" class="home-chevron">⌄</span>'}</button><div id="home-menu-${id}" class="home-mega-menu" hidden>${items.map(([_icon, label, description, href]) => `<${href ? 'a' : 'div'} class="home-menu-entry" ${href ? 'href="' + href + '"' : ''}><span class="home-menu-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${menuIcons[label]}</svg></span><span><strong>${label}</strong><small>${description}</small></span></${href ? 'a' : 'div'}>`).join('')}</div></li>`
     ).join('');
   }
